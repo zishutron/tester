@@ -2681,7 +2681,7 @@
 
 
         // ============================================================
-        // NATIVE ANDROID BRIDGE — abstraction layer
+        // NATIVE ANDROID BRIDGE — Centralized API Wrapper
         // ============================================================
         const ZishuNative = (function() {
             // Safe check for the native interface
@@ -2714,13 +2714,16 @@
                 stopListening: () => callNative('stopListening'),
                 speak: (text) => callNative('speak', text),
                 stopSpeaking: () => callNative('stopSpeaking'),
+                openAppByName: (name) => callNative('openAppByName', name),
                 openApp: (packageName) => callNative('openApp', packageName),
                 searchWeb: (query) => callNative('searchWeb', query),
                 makeCall: (phoneNumber) => callNative('makeCall', phoneNumber),
                 sendSms: (phoneNumber, message) => callNative('sendSms', phoneNumber, message),
                 openSettings: (type) => callNative('openSettings', type),
                 getInstalledApps: () => callNative('getInstalledApps'),
-                showNotification: (title, message) => callNative('showNotification', title, message)
+                showNotification: (title, message) => callNative('showNotification', title, message),
+                startWakeWord: () => callNative('startWakeWord'),
+                stopWakeWord: () => callNative('stopWakeWord')
             };
         })();
 
