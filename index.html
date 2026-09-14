@@ -2741,7 +2741,9 @@
 
                 // -- Communication
                 makeCall: (phoneNumber) => callNative('makeCall', phoneNumber),
+                callContact: (contactName) => callNative('callContact', contactName),
                 sendSms: (phoneNumber, message) => callNative('sendSms', phoneNumber, message),
+                sendSmsToContact: (contactName, message) => callNative('sendSmsToContact', contactName, message),
 
                 // -- Settings
                 openSettings: (type) => callNative('openSettings', type),
@@ -2800,6 +2802,174 @@
             // CONFIG
             // ============================================================
             const BACKEND_URL = 'https://zishu-backend.onrender.com/api/chat';
+
+            // ============================================================
+            // DEVANAGARI → HINGLISH TRANSLITERATION (for AI backend)
+            // ------------------------------------------------------
+            // The backend expects Hinglish (Roman) input.
+            // Voice recognition may return Devanagari (Hindi script).
+            // This lightweight transliterator converts common words so
+            // the AI receives clean Hinglish instead of raw Devanagari.
+            // This does NOT affect UI display (user message stays as-is).
+            // ============================================================
+            const DEVANAGARI_TO_HINGLISH = {
+                // Common pronouns / particles
+                'मैं': 'main', 'मुझे': 'mujhe', 'मेरा': 'mera', 'मेरी': 'meri', 'मेरे': 'mere',
+                'तुम': 'tum', 'तुम्हें': 'tumhe', 'तुम्हारा': 'tumhara', 'तुम्हारी': 'tumhari',
+                'आप': 'aap', 'आपका': 'aapka', 'आपकी': 'aapki', 'आपके': 'aapke',
+                'हम': 'hum', 'हमें': 'humein', 'हमारा': 'hamara', 'हमारी': 'hamari',
+                'यह': 'yeh', 'ये': 'ye', 'वह': 'wo', 'वो': 'wo',
+                'क्या': 'kya', 'क्यों': 'kyon', 'कैसे': 'kaise', 'कहाँ': 'kahan', 'कहां': 'kahan',
+                'कब': 'kab', 'कौन': 'kaun', 'कितना': 'kitna', 'कितनी': 'kitni', 'कितने': 'kitne',
+                // Common verbs
+                'है': 'hai', 'हैं': 'hain', 'था': 'tha', 'थी': 'thi', 'थे': 'the',
+                'हो': 'ho', 'होगा': 'hoga', 'होगी': 'hogi', 'होंगे': 'honge',
+                'कर': 'kar', 'करो': 'karo', 'करना': 'karna', 'करता': 'karta', 'करती': 'karti',
+                'किया': 'kiya', 'किए': 'kiye', 'करें': 'karen', 'करेंगे': 'karenge',
+                'कह': 'keh', 'कहो': 'keho', 'कहना': 'kehna', 'कहा': 'keha',
+                'बता': 'bata', 'बताओ': 'batao', 'बताना': 'batana', 'बताया': 'bataya',
+                'दे': 'de', 'दो': 'do', 'देना': 'dena', 'दिया': 'diya',
+                'ले': 'le', 'लो': 'lo', 'लेना': 'lena', 'लिया': 'liya',
+                'जा': 'ja', 'जाओ': 'jao', 'जाना': 'jana', 'गया': 'gaya', 'गई': 'gayi',
+                'आ': 'aa', 'आओ': 'aao', 'आना': 'aana', 'आया': 'aaya', 'आई': 'aayi',
+                'खोल': 'khol', 'खोलो': 'kholo', 'खोलना': 'kholna', 'खोला': 'khola',
+                'बंद': 'band', 'चालू': 'chalu', 'शुरू': 'shuru',
+                'चला': 'chala', 'चलाओ': 'chalao', 'चलाना': 'chalana',
+                'सुन': 'sun', 'सुनो': 'suno', 'सुनना': 'sunna', 'सुना': 'suna',
+                'बोल': 'bol', 'बोलो': 'bolo', 'बोलना': 'bolna', 'बोला': 'bola',
+                'पूछ': 'pooch', 'पूछो': 'poocho', 'पूछना': 'poochna',
+                'दिखा': 'dikha', 'दिखाओ': 'dikhao', 'दिखाना': 'dikhana',
+                'समझ': 'samajh', 'समझो': 'samjho', 'समझना': 'samajhna',
+                'जान': 'jaan', 'जानो': 'jaano', 'जानना': 'jaanna',
+                'मिल': 'mil', 'मिलो': 'milo', 'मिलना': 'milna',
+                'रुक': 'ruk', 'रुको': 'ruko', 'रुकना': 'rukna',
+                'सोच': 'soch', 'सोचो': 'socho', 'सोचना': 'sochna',
+                'पढ़': 'padh', 'पढ़ो': 'padho', 'पढ़ना': 'padhna',
+                'लिख': 'likh', 'लिखो': 'likho', 'लिखना': 'likhna',
+                'भेज': 'bhej', 'भेजो': 'bhejo', 'भेजना': 'bhejna',
+                'लगा': 'laga', 'लगाओ': 'lagao', 'लगाना': 'lagana',
+                'रख': 'rakh', 'रखो': 'rakho', 'रखना': 'rakhna',
+                'पी': 'pi', 'पियो': 'piyo', 'पीना': 'peena',
+                'खा': 'kha', 'खाओ': 'khao', 'खाना': 'khana',
+                // Common nouns
+                'नाम': 'naam', 'काम': 'kaam', 'समय': 'samay', 'दिन': 'din', 'रात': 'raat',
+                'सुबह': 'subah', 'शाम': 'shaam', 'दोपहर': 'dopahar',
+                'आज': 'aaj', 'कल': 'kal', 'परसों': 'parson', 'अभी': 'abhi',
+                'घर': 'ghar', 'बाहर': 'bahar', 'अंदर': 'andar', 'ऊपर': 'upar', 'नीचे': 'neeche',
+                'पानी': 'paani', 'खाना': 'khaana', 'चाय': 'chai', 'कॉफी': 'coffee',
+                'दोस्त': 'dost', 'भाई': 'bhai', 'बहन': 'behen', 'माँ': 'maa', 'मां': 'maa', 'पापा': 'papa',
+                'बेटा': 'beta', 'बेटी': 'beti', 'पत्नी': 'patni', 'पति': 'pati',
+                'नंबर': 'number', 'फोन': 'phone', 'मोबाइल': 'mobile', 'कॉल': 'call',
+                'मैसेज': 'message', 'संदेश': 'sandesh', 'ईमेल': 'email',
+                'नोट': 'note', 'नोट्स': 'notes', 'रिमाइंडर': 'reminder',
+                'अलार्म': 'alarm', 'समाचार': 'samachar', 'खबर': 'khabar',
+                'मौसम': 'mausam', 'बारिश': 'barish', 'धूप': 'dhoop', 'ठंड': 'thand', 'गर्मी': 'garmi',
+                'पैसा': 'paisa', 'पैसे': 'paise', 'रुपये': 'rupaye', 'कीमत': 'keemat',
+                'जगह': 'jagah', 'शहर': 'shahar', 'गाँव': 'gaon', 'गांव': 'gaon', 'देश': 'desh',
+                'स्कूल': 'school', 'कॉलेज': 'college', 'ऑफिस': 'office', 'कंपनी': 'company',
+                'किताब': 'kitaab', 'किताबें': 'kitaabein', 'फिल्म': 'film', 'गाना': 'gaana', 'गाने': 'gaane',
+                'खेल': 'khel', 'मैच': 'match', 'टीम': 'team',
+                'बीमार': 'beemar', 'दवा': 'dawa', 'डॉक्टर': 'doctor', 'अस्पताल': 'aspataal',
+                'सेटिंग': 'setting', 'सेटिंग्स': 'settings', 'वाईफाई': 'wifi', 'ब्लूटूथ': 'bluetooth',
+                'कैमरा': 'camera', 'गैलरी': 'gallery', 'फोटो': 'photo', 'वीडियो': 'video',
+                'ऐप': 'app', 'ऐप्स': 'apps', 'वेबसाइट': 'website',
+                'यूट्यूब': 'youtube', 'इंस्टाग्राम': 'instagram', 'फेसबुक': 'facebook',
+                'व्हाट्सएप': 'whatsapp', 'व्हाट्सऐप': 'whatsapp', 'टेलीग्राम': 'telegram',
+                'जीमेल': 'gmail', 'गूगल': 'google', 'क्रोम': 'chrome',
+                'मैप': 'map', 'मैप्स': 'maps', 'नक्शा': 'naksha',
+                // Common adjectives / adverbs
+                'अच्छा': 'achha', 'अच्छी': 'achhi', 'अच्छे': 'achhe',
+                'बुरा': 'bura', 'बुरी': 'buri', 'बुरे': 'bure',
+                'बड़ा': 'bada', 'बड़ी': 'badi', 'बड़े': 'bade',
+                'छोटा': 'chhota', 'छोटी': 'chhoti', 'छोटे': 'chhote',
+                'नया': 'naya', 'नई': 'nayi', 'नए': 'naye',
+                'पुराना': 'purana', 'पुरानी': 'purani', 'पुराने': 'purane',
+                'जल्दी': 'jaldi', 'धीरे': 'dheere', 'फिर': 'phir', 'फ़िर': 'phir',
+                'बहुत': 'bahut', 'थोड़ा': 'thoda', 'थोड़ी': 'thodi', 'थोड़े': 'thode',
+                'सब': 'sab', 'सबकुछ': 'sabkuch', 'कुछ': 'kuch', 'कोई': 'koi',
+                'और': 'aur', 'या': 'ya', 'लेकिन': 'lekin', 'पर': 'par', 'मगर': 'magar',
+                'भी': 'bhi', 'तो': 'to', 'ही': 'hi', 'ना': 'na', 'नहीं': 'nahi', 'नही': 'nahi',
+                'हाँ': 'haan', 'हां': 'haan', 'जी': 'ji', 'ठीक': 'theek', 'ठीक है': 'theek hai',
+                'बाद': 'baad', 'पहले': 'pehle', 'पहली': 'pehli',
+                'यहाँ': 'yahan', 'यहां': 'yahan', 'वहाँ': 'wahan', 'वहां': 'wahan',
+                // Numbers
+                'एक': 'ek', 'दो': 'do', 'तीन': 'teen', 'चार': 'chaar', 'पाँच': 'paanch', 'पांच': 'paanch',
+                'छह': 'chhe', 'सात': 'saat', 'आठ': 'aath', 'नौ': 'nau', 'दस': 'das',
+                'बीस': 'bees', 'तीस': 'tees', 'चालीस': 'chalees', 'पचास': 'pachaas',
+                'साठ': 'saath', 'सत्तर': 'sattar', 'अस्सी': 'assi', 'नब्बे': 'nabbe', 'सौ': 'sau',
+                'हज़ार': 'hazaar', 'हजार': 'hazaar', 'लाख': 'laakh', 'करोड़': 'crore',
+                // Directions
+                'बाएँ': 'baayein', 'दाएँ': 'daayein', 'सीधे': 'seedhe', 'पीछे': 'peeche', 'आगे': 'aage',
+                // Time
+                'बजे': 'baje', 'बजा': 'baja', 'मिनट': 'minute', 'सेकंड': 'second', 'घंटा': 'ghanta', 'घंटे': 'ghante',
+                'हफ्ता': 'hafte', 'हफ्ते': 'hafte', 'महीना': 'mahina', 'महीने': 'mahine', 'साल': 'saal', 'वर्ष': 'varsh',
+                // Misc common
+                'कृपया': 'kripya', 'धन्यवाद': 'dhanyavaad', 'शुक्रिया': 'shukriya',
+                'नमस्ते': 'namaste', 'नमस्कार': 'namaskar', 'हैलो': 'hello', 'हाय': 'hi',
+                'अलविदा': 'alvida', 'बाय': 'bye',
+                'मदद': 'madad', 'सहायता': 'sahayata', 'जरूरत': 'zaroorat', 'चाहिए': 'chahiye',
+                'चाहता': 'chahta', 'चाहती': 'chahti',
+                'पसंद': 'pasand', 'नापसंद': 'napasand',
+                'खुश': 'khush', 'दुखी': 'dukhi', 'गुस्सा': 'gussa', 'परेशान': 'pareshan',
+                'माफ': 'maaf', 'माफी': 'maafi', 'क्षमा': 'kshama',
+                'सच': 'sach', 'झूठ': 'jhooth', 'सही': 'sahi', 'गलत': 'galat',
+                'आसान': 'aasaan', 'मुश्किल': 'mushkil', 'कठिन': 'kathin',
+                'जरूरी': 'zaroori', 'महत्वपूर्ण': 'mahatvapoorn',
+                'होशियार': 'hoshiyar', 'समझदार': 'samajhdaar', 'बुद्धिमान': 'buddhimaan',
+                'सुंदर': 'sundar', 'प्यारा': 'pyaara', 'प्यारी': 'pyaari'
+            };
+
+            // Multi-word phrases (must be replaced before single words)
+            const DEVANAGARI_PHRASES = [
+                ['कृपया', 'kripya'],
+                ['धन्यवाद', 'dhanyavaad'],
+                ['शुक्रिया', 'shukriya'],
+                ['नमस्ते', 'namaste'],
+                ['नमस्कार', 'namaskar'],
+                ['ठीक है', 'theek hai'],
+                ['मदद करो', 'madad karo'],
+                ['माफ करो', 'maaf karo'],
+                ['माफ़ करो', 'maaf karo'],
+                ['क्या हो रहा है', 'kya ho raha hai'],
+                ['क्या कर रहे हो', 'kya kar rahe ho'],
+                ['क्या कर रही हो', 'kya kar rahi ho'],
+                ['कैसे हो', 'kaise ho'],
+                ['कहाँ हो', 'kahan ho'],
+                ['कहां हो', 'kahan ho']
+            ];
+
+            // Transliterate a string from Devanagari to Hinglish
+            function transliterateDevanagariToHinglish(text) {
+                if (!text) return text;
+                var result = String(text);
+
+                // Replace multi-word phrases first
+                for (var p = 0; p < DEVANAGARI_PHRASES.length; p++) {
+                    var phrase = DEVANAGARI_PHRASES[p][0];
+                    var replacement = DEVANAGARI_PHRASES[p][1];
+                    // Use simple split-join (safe, no regex escaping issues)
+                    result = result.split(phrase).join(' ' + replacement + ' ');
+                }
+
+                // Replace known single words
+                for (var hindiWord in DEVANAGARI_TO_HINGLISH) {
+                    if (DEVANAGARI_TO_HINGLISH.hasOwnProperty(hindiWord)) {
+                        var hinglishWord = DEVANAGARI_TO_HINGLISH[hindiWord];
+                        result = result.split(hindiWord).join(' ' + hinglishWord + ' ');
+                    }
+                }
+
+                // Fallback: strip any remaining Devanagari characters that we
+                // couldn't map (so backend never receives raw Hindi script).
+                // This keeps the message readable and prevents the AI from
+                // replying in Hindi script due to Hindi input.
+                result = result.replace(/[\u0900-\u097F]+/g, ' ');
+
+                // Cleanup multiple spaces
+                result = result.replace(/\s+/g, ' ').trim();
+
+                return result;
+            }
 
             // ============================================================
             // STATE MACHINE
@@ -3992,6 +4162,23 @@
                         addActionMessage(msg4);
                         speakText(msg4);
                     }
+                } else if (action.type === 'send_sms_contact') {
+                    if (hasNative) {
+                        var r3 = ZishuNative.sendSmsToContact(action.data.contactName, action.data.message);
+                        if (r3 === null) {
+                            var msg5 = 'SMS feature available nahi hai.';
+                            addActionMessage(msg5);
+                            speakText(msg5);
+                        } else {
+                            var okMsg3 = action.data.contactName + ' ko SMS bhej rahi hoon.';
+                            addActionMessage(okMsg3);
+                            speakText(okMsg3);
+                        }
+                    } else {
+                        var msg6 = 'Native SMS support is not available in this browser.';
+                        addActionMessage(msg6);
+                        speakText(msg6);
+                    }
                 }
 
                 isProcessing = false;
@@ -4152,24 +4339,147 @@
                 }
 
                 // ---------- CALL ----------
-                var callWords = ['call karo', 'phone karo', 'call kar', 'call lagao', 'phone lagao', 'call', 'कॉल करो', 'कॉल कर', 'फोन करो', 'फोन कर'];
-                var hasCallIntent = callWords.some(function(w) { return q.includes(w); });
+                var callWords = [
+                    'call karo',
+                    'call kar',
+                    'call lagao',
+                    'phone karo',
+                    'phone kar',
+                    'phone lagao',
+                    'call',
+                    'कॉल करो',
+                    'कॉल कर',
+                    'कॉल लगाओ',
+                    'फोन करो',
+                    'फोन कर',
+                    'फोन लगाओ'
+                ];
+
+                var hasCallIntent = callWords.some(function(w) {
+                    return q.includes(w);
+                });
+
                 if (hasCallIntent) {
-                    var phoneMatch = q.match(/(\+?\d[\d\s\-]{7,15}\d)/);
+
+                    // -----------------------------------------
+                    // FIRST: CHECK FOR PHONE NUMBER
+                    // -----------------------------------------
+
+                    var phoneMatch =
+                        q.match(/(\+?\d[\d\s\-]{7,15}\d)/);
+
                     if (phoneMatch) {
-                        var phoneNumber = phoneMatch[1].replace(/[\s\-]/g, '');
+
+                        var phoneNumber =
+                            phoneMatch[1].replace(/[\s\-]/g, '');
+
                         if (phoneNumber.length >= 8) {
-                            return { type: 'make_call', data: { phoneNumber: phoneNumber }, needsConfirmation: true };
+
+                            return {
+                                type: 'make_call',
+                                data: {
+                                    phoneNumber: phoneNumber
+                                },
+                                needsConfirmation: true
+                            };
                         }
                     }
-                    return { type: 'make_call_need_number', data: {} };
+
+                    // -----------------------------------------
+                    // SECOND: CHECK FOR CONTACT NAME
+                    // -----------------------------------------
+
+                    var contactName = q;
+
+                    // Remove common calling phrases
+                    contactName = contactName
+                        .replace(/call karo/gi, ' ')
+                        .replace(/call karna/gi, ' ')
+                        .replace(/call kar/gi, ' ')
+                        .replace(/call lagao/gi, ' ')
+                        .replace(/phone karo/gi, ' ')
+                        .replace(/phone karna/gi, ' ')
+                        .replace(/phone kar/gi, ' ')
+                        .replace(/phone lagao/gi, ' ')
+                        .replace(/कॉल करो/g, ' ')
+                        .replace(/कॉल करना/g, ' ')
+                        .replace(/कॉल कर/g, ' ')
+                        .replace(/कॉल लगाओ/g, ' ')
+                        .replace(/फोन करो/g, ' ')
+                        .replace(/फोन करना/g, ' ')
+                        .replace(/फोन कर/g, ' ')
+                        .replace(/फोन लगाओ/g, ' ');
+
+                    // Remove common Hindi/Hinglish connecting words
+                    contactName = contactName
+                        .replace(/\bko\b/gi, ' ')
+                        .replace(/\bpar\b/gi, ' ')
+                        .replace(/\bpe\b/gi, ' ')
+                        .replace(/\bmein\b/gi, ' ')
+                        .replace(/\bme\b/gi, ' ')
+                        .replace(/को/g, ' ')
+                        .replace(/पर/g, ' ')
+                        .replace(/पे/g, ' ')
+                        .replace(/में/g, ' ')
+                        .replace(/मे/g, ' ');
+
+                    contactName = contactName
+                        .replace(/[.,!?]/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+
+                    // -----------------------------------------
+                    // REMOVE COMMAND WORD "CALL" IF LEFT
+                    // -----------------------------------------
+
+                    contactName = contactName
+                        .replace(/^call\s+/i, '')
+                        .replace(/^phone\s+/i, '')
+                        .trim();
+
+                    // -----------------------------------------
+                    // CONTACT NAME FOUND
+                    // -----------------------------------------
+
+                    if (contactName.length > 0) {
+
+                        return {
+                            type: 'call_contact',
+                            data: {
+                                contactName: contactName
+                            }
+                        };
+                    }
+
+                    // -----------------------------------------
+                    // NOTHING FOUND
+                    // -----------------------------------------
+
+                    return {
+                        type: 'make_call_need_number',
+                        data: {}
+                    };
                 }
 
                 // ---------- SMS ----------
-                var smsWords = ['sms bhejo', 'message bhejo', 'sms karo', 'message karo', 'एसएमएस भेजो', 'मैसेज भेजो', 'संदेश भेजो', 'text bhejo'];
+                // Supports BOTH:
+                //   1) SMS to a phone number: "9876543210 ko message bhejo"
+                //   2) SMS to a contact name:  "Rahul ko message bhejo"
+                var smsWords = [
+                    'sms bhejo', 'message bhejo', 'sms karo', 'message karo',
+                    'message bhej', 'sms bhej',
+                    'एसएमएस भेजो', 'मैसेज भेजो', 'संदेश भेजो', 'text bhejo',
+                    'एसएमएस भेज', 'मैसेज भेज'
+                ];
                 var hasSmsIntent = smsWords.some(function(w) { return q.includes(w); });
+
                 if (hasSmsIntent) {
+
+                    // -----------------------------------------
+                    // FIRST: CHECK FOR PHONE NUMBER
+                    // -----------------------------------------
                     var smsPhoneMatch = q.match(/(\+?\d[\d\s\-]{7,15}\d)/);
+
                     if (smsPhoneMatch) {
                         var smsPhone = smsPhoneMatch[1].replace(/[\s\-]/g, '');
                         var msgMatch = q.match(/["'"'](.+?)["'"']/);
@@ -4179,6 +4489,73 @@
                         }
                         return { type: 'send_sms', data: { phoneNumber: smsPhone, message: msgText }, needsConfirmation: true };
                     }
+
+                    // -----------------------------------------
+                    // SECOND: CHECK FOR CONTACT NAME
+                    // -----------------------------------------
+                    var smsContactName = q;
+
+                    // Remove common SMS phrases
+                    smsContactName = smsContactName
+                        .replace(/sms bhejo/gi, ' ')
+                        .replace(/sms bhej/gi, ' ')
+                        .replace(/message bhejo/gi, ' ')
+                        .replace(/message bhej/gi, ' ')
+                        .replace(/message karo/gi, ' ')
+                        .replace(/sms karo/gi, ' ')
+                        .replace(/text bhejo/gi, ' ')
+                        .replace(/एसएमएस भेजो/g, ' ')
+                        .replace(/एसएमएस भेज/g, ' ')
+                        .replace(/मैसेज भेजो/g, ' ')
+                        .replace(/मैसेज भेज/g, ' ')
+                        .replace(/संदेश भेजो/g, ' ');
+
+                    // Remove common Hindi/Hinglish connecting words
+                    smsContactName = smsContactName
+                        .replace(/\bko\b/gi, ' ')
+                        .replace(/\bpar\b/gi, ' ')
+                        .replace(/\bpe\b/gi, ' ')
+                        .replace(/\bmein\b/gi, ' ')
+                        .replace(/\bme\b/gi, ' ')
+                        .replace(/को/g, ' ')
+                        .replace(/पर/g, ' ')
+                        .replace(/पे/g, ' ')
+                        .replace(/में/g, ' ')
+                        .replace(/मे/g, ' ');
+
+                    // Extract message text inside quotes (if any)
+                    var smsContactMsgMatch = q.match(/["'"'](.+?)["'"']/);
+                    var smsContactMessage = smsContactMsgMatch ? smsContactMsgMatch[1] : null;
+
+                    // Also try to detect message after common keywords
+                    if (!smsContactMessage) {
+                        var afterMsgMatch = q.match(/(?:message|मैसेज|संदेश|sms|एसएमएस)\s*(?:karo|kar|bhejo|bhej|भेजो|भेज)\s*(?:ki|कि|:)?\s*["'"']?(.+?)["'"']?$/i);
+                        if (afterMsgMatch && afterMsgMatch[1]) {
+                            smsContactMessage = afterMsgMatch[1].trim();
+                        }
+                    }
+
+                    smsContactName = smsContactName
+                        .replace(/["'"'].+?["'"']/g, ' ')
+                        .replace(/[.,!?]/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+
+                    // If the remaining text is a plausible contact name
+                    if (smsContactName.length > 0 && !/^\d+$/.test(smsContactName)) {
+                        if (!smsContactMessage) {
+                            return {
+                                type: 'send_sms_contact_need_message',
+                                data: { contactName: smsContactName }
+                            };
+                        }
+                        return {
+                            type: 'send_sms_contact',
+                            data: { contactName: smsContactName, message: smsContactMessage },
+                            needsConfirmation: true
+                        };
+                    }
+
                     return { type: 'send_sms_need_number', data: {} };
                 }
 
@@ -4347,6 +4724,47 @@
                     return true;
                 }
 
+                // ---- call_contact ----
+                if (cmd.type === 'call_contact') {
+
+                    var contactName = cmd.data.contactName;
+
+                    console.log(
+                        '[Zishu Native] Calling contact:',
+                        contactName
+                    );
+
+                    if (hasNative) {
+
+                        var result =
+                            ZishuNative.callContact(contactName);
+
+                        // Java method is void, so result may be undefined.
+                        // Actual success/error comes through native callbacks.
+
+                        var contactMsg =
+                            contactName +
+                            ' ko call screen par le ja rahi hoon.';
+
+                        addActionMessage(contactMsg);
+                        speakText(contactMsg);
+
+                    } else {
+
+                        var browserMsg =
+                            'Contact calling sirf Android app mein available hai.';
+
+                        addActionMessage(browserMsg);
+                        speakText(browserMsg);
+                    }
+
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+
+                    return true;
+                }
+
                 // ---- make_call ----
                 if (cmd.type === 'make_call') {
                     // Needs confirmation
@@ -4370,12 +4788,39 @@
                     return true;
                 }
 
-                // ---- send_sms ----
+                // ---- send_sms (to phone number) ----
                 if (cmd.type === 'send_sms') {
                     pendingNativeAction = { type: 'send_sms', data: cmd.data };
                     var confMsg2 = cmd.data.phoneNumber + ' ko message bhejna hai: "' + cmd.data.message + '". Confirm karein? (haan / nahi)';
                     addActionMessage(confMsg2);
                     speakText(confMsg2);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1500);
+                    return true;
+                }
+
+                // ---- send_sms_contact (to contact name) ----
+                if (cmd.type === 'send_sms_contact') {
+                    pendingNativeAction = { type: 'send_sms_contact', data: cmd.data };
+                    var confMsgContact = cmd.data.contactName + ' ko message bhejna hai: "' + cmd.data.message + '". Confirm karein? (haan / nahi)';
+                    addActionMessage(confMsgContact);
+                    speakText(confMsgContact);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1500);
+                    return true;
+                }
+
+                if (cmd.type === 'send_sms_contact_need_message') {
+                    // Store pending contact to reuse when the message arrives
+                    pendingNativeAction = {
+                        type: 'await_sms_contact_message',
+                        data: { contactName: cmd.data.contactName }
+                    };
+                    var msgCM = cmd.data.contactName + ' ko kya message bhejna hai? Bataiye.';
+                    addActionMessage(msgCM);
+                    speakText(msgCM);
                     isProcessing = false;
                     setOrbState(STATE.IDLE);
                     scheduleRestart(1500);
@@ -4393,7 +4838,7 @@
                 }
 
                 if (cmd.type === 'send_sms_need_number') {
-                    var msg4 = 'Kis number par SMS bhejna hai? Number bataiye.';
+                    var msg4 = 'Kis contact ko SMS bhejna hai? Contact ka naam bataiye.';
                     addActionMessage(msg4);
                     speakText(msg4);
                     isProcessing = false;
@@ -4499,15 +4944,37 @@
 
                 // 1. Check pending confirmation
                 if (pendingNativeAction) {
-                    if (isConfirmationYes(query)) {
+                    // If we were waiting for a contact message body
+                    if (pendingNativeAction.type === 'await_sms_contact_message') {
+                        var pendingContact = pendingNativeAction.data.contactName;
+                        var messageBody = query.trim();
+                        if (messageBody.length > 0 && !isConfirmationNo(query)) {
+                            // Now we have the message — ask for confirmation
+                            pendingNativeAction = {
+                                type: 'send_sms_contact',
+                                data: { contactName: pendingContact, message: messageBody }
+                            };
+                            var confirmMsg = pendingContact + ' ko message bhejna hai: "' + messageBody + '". Confirm karein? (haan / nahi)';
+                            addActionMessage(confirmMsg);
+                            speakText(confirmMsg);
+                            isProcessing = false;
+                            setOrbState(STATE.IDLE);
+                            scheduleRestart(1500);
+                            return;
+                        } else {
+                            pendingNativeAction = null;
+                            // fall through to normal processing
+                        }
+                    } else if (isConfirmationYes(query)) {
                         executePendingAction();
                         return;
                     } else if (isConfirmationNo(query)) {
                         cancelPendingAction();
                         return;
+                    } else {
+                        // If neither, clear pending and continue
+                        pendingNativeAction = null;
                     }
-                    // If neither, clear pending and continue
-                    pendingNativeAction = null;
                 }
 
                 // 2. Native commands
@@ -4555,8 +5022,15 @@
                 }
 
                 // 6. AI backend
+                // --------------------------------------------------------
+                // IMPORTANT: Before sending to backend, transliterate any
+                // Devanagari (Hindi script) text to Hinglish (Roman).
+                // This ensures the AI always receives Hinglish input and
+                // therefore replies in Hinglish/English, never in Hindi.
+                // --------------------------------------------------------
                 try {
-                    var timestampedQuery = query + ' (Current date: ' + new Date().toISOString().split('T')[0] + ')';
+                    var hinglishQuery = transliterateDevanagariToHinglish(query);
+                    var timestampedQuery = hinglishQuery + ' (Current date: ' + new Date().toISOString().split('T')[0] + ')';
 
                     fetch(BACKEND_URL, {
                             method: 'POST',
@@ -4781,6 +5255,8 @@
                             addActionMessage('Permission denied. Please grant permission.');
                         } else if (r === 'failed' || r === 'error') {
                             addActionMessage('Kuch galat ho gaya. Dobara try karein.');
+                        } else if (r === 'contact_not_found') {
+                            addActionMessage('Yeh contact aapke phone mein nahi mila.');
                         }
                     }
                 } catch (e) {
@@ -4963,9 +5439,10 @@
             console.log('Hash-based navigation enabled');
             console.log('Support email is now a clickable button');
             console.log('Login system removed - Zishu is now fully free to use');
+            console.log('Devanagari → Hinglish transliteration enabled for AI backend');
+            console.log('SMS by contact name enabled via sendSmsToContact bridge');
         })();
     </script>
 
 </body>
 </html>
-                     
