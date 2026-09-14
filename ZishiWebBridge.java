@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -19,6 +21,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
 import java.net.URLEncoder;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +35,9 @@ public class ZishuWebBridge {
     private TextToSpeech textToSpeech;
 
     private static final int REQUEST_RECORD_AUDIO = 1001;
+    private static final int REQUEST_READ_CONTACTS = 1002;
+
+    private String pendingContactName = null;
 
     public ZishuWebBridge(
             Activity activity,
@@ -569,6 +575,7 @@ public class ZishuWebBridge {
                     query.trim().length() == 0) {
 
                 mapQuery = "Google Maps";
+
             } else {
 
                 mapQuery = query.trim();
@@ -606,7 +613,7 @@ public class ZishuWebBridge {
     }
 
     // =========================================================
-    // PHONE DIALER
+    // CALL BY PHONE NUMBER
     // =========================================================
 
     @JavascriptInterface
@@ -632,7 +639,8 @@ public class ZishuWebBridge {
                     new Intent(
                             Intent.ACTION_DIAL,
                             Uri.parse(
-                                    "tel:" + Uri.encode(number)
+                                    "tel:" +
+                                            Uri.encode(number)
                             )
                     );
 
@@ -647,6 +655,1176 @@ public class ZishuWebBridge {
 
             sendActionResult(
                     "make_call",
+                    "error"
+            );
+        }
+    }
+
+    // =========================================================
+    // CALL CONTACT BY NAME
+    // =========================================================
+
+    @JavascriptInterface
+    public void callContact(String contactName) {
+
+        if (contactName == null ||
+                contactName.trim().length() == 0) {
+
+            sendActionResult(
+                    "call_contact",
+                    "invalid_name"
+            );
+
+            return;
+        }
+
+        String name =
+                cleanContactQuery(
+                        contactName
+                );
+
+        if (name.length() == 0) {
+
+            sendActionResult(
+                    "call_contact",
+                    "invalid_name"
+            );
+
+            return;
+        }
+
+        if (activity.checkSelfPermission(
+                Manifest.permission.READ_CONTACTS
+        ) != PackageManager.PERMISSION_GRANTED) {
+
+            pendingContactName = name;
+
+            activity.requestPermissions(
+                    new String[]{
+                            Manifest.permission.READ_CONTACTS
+                    },
+                    REQUEST_READ_CONTACTS
+            );
+
+            return;
+        }
+
+        findContactAndOpenDialer(name);
+    }
+
+    // =========================================================
+    // FIND CONTACT
+    // =========================================================
+
+    private void findContactAndOpenDialer(
+            String contactName
+    ) {
+
+        Cursor cursor = null;
+
+        try {
+
+            String query =
+                    cleanContactQuery(
+                            contactName
+                    );
+
+            if (query.length() == 0) {
+
+                sendActionResult(
+                        "call_contact",
+                        "invalid_name"
+                );
+
+                return;
+            }
+
+            String[] projection =
+                    new String[]{
+                            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                            ContactsContract.CommonDataKinds.Phone.NUMBER
+                    };
+
+            /*
+             * IMPORTANT:
+             *
+             * We do NOT depend only on:
+             *
+             * DISPLAY_NAME = query
+             *
+             * because voice may return:
+             *
+             * राहुल
+             *
+             * while contact is:
+             *
+             * Rahul
+             *
+             * Therefore we read contact names and compare
+             * normalized/transliterated versions ourselves.
+             */
+
+            cursor =
+                    activity.getContentResolver().query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            projection,
+                            null,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME +
+                                    " ASC"
+                    );
+
+            if (cursor == null) {
+
+                sendActionResult(
+                        "call_contact",
+                        "contact_not_found"
+                );
+
+                return;
+            }
+
+            String normalizedQuery =
+                    normalizeForContactMatch(
+                            query
+                    );
+
+            String bestNumber = null;
+            String bestName = null;
+            int bestScore = 0;
+
+            while (cursor.moveToNext()) {
+
+                int nameIndex =
+                        cursor.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+                        );
+
+                int numberIndex =
+                        cursor.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER
+                        );
+
+                if (nameIndex < 0 ||
+                        numberIndex < 0) {
+
+                    continue;
+                }
+
+                String savedName =
+                        cursor.getString(
+                                nameIndex
+                        );
+
+                String phoneNumber =
+                        cursor.getString(
+                                numberIndex
+                        );
+
+                if (savedName == null ||
+                        phoneNumber == null) {
+
+                    continue;
+                }
+
+                if (savedName.trim().length() == 0 ||
+                        phoneNumber.trim().length() == 0) {
+
+                    continue;
+                }
+
+                String normalizedContact =
+                        normalizeForContactMatch(
+                                savedName
+                        );
+
+                int score =
+                        calculateContactMatchScore(
+                                normalizedQuery,
+                                normalizedContact,
+                                query,
+                                savedName
+                        );
+
+                if (score > bestScore) {
+
+                    bestScore = score;
+                    bestNumber = phoneNumber;
+                    bestName = savedName;
+                }
+            }
+
+            cursor.close();
+            cursor = null;
+
+            /*
+             * Require a meaningful match.
+             *
+             * Exact normalized match:
+             * 100
+             *
+             * Token/contains match:
+             * 80-90
+             *
+             * Fuzzy match:
+             * 70+
+             */
+
+            if (bestNumber != null &&
+                    bestScore >= 70) {
+
+                openDialerForNumber(
+                        bestNumber
+                );
+
+                return;
+            }
+
+            sendActionResult(
+                    "call_contact",
+                    "contact_not_found"
+            );
+
+        } catch (SecurityException e) {
+
+            sendActionResult(
+                    "call_contact",
+                    "permission_denied"
+            );
+
+        } catch (Exception e) {
+
+            sendActionResult(
+                    "call_contact",
+                    "error"
+            );
+
+        } finally {
+
+            if (cursor != null) {
+
+                try {
+                    cursor.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
+    // =========================================================
+    // CONTACT MATCH SCORE
+    // =========================================================
+
+    private int calculateContactMatchScore(
+            String query,
+            String contact,
+            String originalQuery,
+            String originalContact
+    ) {
+
+        if (query == null ||
+                contact == null) {
+
+            return 0;
+        }
+
+        if (query.length() == 0 ||
+                contact.length() == 0) {
+
+            return 0;
+        }
+
+        // Exact normalized match
+        if (query.equals(contact)) {
+
+            return 100;
+        }
+
+        // Contact contains query
+        if (contact.contains(query)) {
+
+            return 90;
+        }
+
+        // Query contains contact
+        if (query.contains(contact) &&
+                contact.length() >= 3) {
+
+            return 85;
+        }
+
+        // Compare individual name tokens
+        String[] contactTokens =
+                contact.split(" ");
+
+        String[] queryTokens =
+                query.split(" ");
+
+        int tokenBest = 0;
+
+        for (String q : queryTokens) {
+
+            if (q.length() < 2) {
+                continue;
+            }
+
+            for (String c : contactTokens) {
+
+                if (c.length() < 2) {
+                    continue;
+                }
+
+                if (q.equals(c)) {
+
+                    tokenBest = 88;
+
+                } else if (c.contains(q) ||
+                        q.contains(c)) {
+
+                    if (tokenBest < 80) {
+                        tokenBest = 80;
+                    }
+                }
+            }
+        }
+
+        if (tokenBest > 0) {
+            return tokenBest;
+        }
+
+        // Fuzzy matching
+        double similarity =
+                calculateSimilarity(
+                        query,
+                        contact
+                );
+
+        if (similarity >= 0.90) {
+            return 82;
+        }
+
+        if (similarity >= 0.82) {
+            return 75;
+        }
+
+        if (similarity >= 0.75 &&
+                query.length() >= 4 &&
+                contact.length() >= 4) {
+
+            return 70;
+        }
+
+        return 0;
+    }
+
+    // =========================================================
+    // CONTACT QUERY CLEANER
+    // =========================================================
+
+    private String cleanContactQuery(
+            String text
+    ) {
+
+        if (text == null) {
+            return "";
+        }
+
+        String result =
+                text.trim();
+
+        /*
+         * Remove common calling phrases.
+         */
+
+        String[] phrases =
+                new String[]{
+
+                        "मुझे",
+                        "मेरे",
+                        "मेरी",
+                        "को",
+                        "का",
+                        "की",
+                        "के",
+                        "से",
+                        "पर",
+
+                        "कॉल",
+                        "काल",
+                        "फोन",
+                        "फ़ोन",
+                        "करो",
+                        "करना",
+                        "कर",
+                        "लगाओ",
+                        "लगाना",
+                        "मिलाओ",
+                        "मिलाना",
+
+                        "call",
+                        "phone",
+                        "please",
+                        "pls",
+                        "karo",
+                        "karna",
+                        "kar",
+                        "lagao",
+                        "lagana",
+                        "milao",
+                        "milana",
+                        "ko",
+                        "se",
+                        "please call"
+                };
+
+        for (int i = 0;
+                i < phrases.length;
+                i++) {
+
+            String phrase =
+                    phrases[i];
+
+            result =
+                    result.replace(
+                            phrase,
+                            " "
+                    );
+        }
+
+        result =
+                result.replace(
+                        "  ",
+                        " "
+                ).trim();
+
+        /*
+         * Repeat cleanup in case multiple spaces
+         * were created.
+         */
+
+        while (result.contains("  ")) {
+
+            result =
+                    result.replace(
+                            "  ",
+                            " "
+                    );
+        }
+
+        return result.trim();
+    }
+
+    // =========================================================
+    // CONTACT NORMALIZATION
+    // =========================================================
+
+    private String normalizeForContactMatch(
+            String text
+    ) {
+
+        if (text == null) {
+            return "";
+        }
+
+        String value =
+                text.trim().toLowerCase(
+                        Locale.ROOT
+                );
+
+        /*
+         * Remove calling command words first.
+         */
+
+        value =
+                cleanContactQuery(
+                        value
+                );
+
+        /*
+         * Convert Devanagari Hindi to Latin
+         * phonetic representation.
+         */
+
+        value =
+                transliterateDevanagari(
+                        value
+                );
+
+        /*
+         * Remove accents/diacritics.
+         */
+
+        value =
+                Normalizer.normalize(
+                        value,
+                        Normalizer.Form.NFD
+                );
+
+        value =
+                value.replaceAll(
+                        "\\p{InCombiningDiacriticalMarks}+",
+                        ""
+                );
+
+        /*
+         * Keep only letters and numbers.
+         */
+
+        value =
+                value.replaceAll(
+                        "[^a-z0-9 ]",
+                        " "
+                );
+
+        /*
+         * Normalize spaces.
+         */
+
+        value =
+                value.replaceAll(
+                        "\\s+",
+                        " "
+                ).trim();
+
+        /*
+         * Normalize some common Hinglish variations.
+         */
+
+        value =
+                value.replace(
+                        "sh",
+                        "sh"
+                );
+
+        /*
+         * Devanagari transliteration can produce a
+         * final inherent "a":
+         *
+         * राहुल -> rahula
+         *
+         * Contact:
+         * Rahul -> rahul
+         *
+         * Remove final "a" for matching.
+         */
+
+        String[] words =
+                value.split(" ");
+
+        StringBuilder builder =
+                new StringBuilder();
+
+        for (int i = 0;
+                i < words.length;
+                i++) {
+
+            String word =
+                    words[i];
+
+            if (word.length() > 3 &&
+                    word.endsWith("a")) {
+
+                word =
+                        word.substring(
+                                0,
+                                word.length() - 1
+                        );
+            }
+
+            if (word.length() > 0) {
+
+                if (builder.length() > 0) {
+                    builder.append(" ");
+                }
+
+                builder.append(word);
+            }
+        }
+
+        return builder.toString().trim();
+    }
+
+    // =========================================================
+    // DEVANAGARI TO LATIN TRANSLITERATION
+    // =========================================================
+
+    private String transliterateDevanagari(
+            String input
+    ) {
+
+        if (input == null ||
+                input.length() == 0) {
+
+            return "";
+        }
+
+        StringBuilder output =
+                new StringBuilder();
+
+        boolean previousWasConsonant =
+                false;
+
+        for (int i = 0;
+                i < input.length();
+                i++) {
+
+            char ch =
+                    input.charAt(i);
+
+            String consonant =
+                    getDevanagariConsonant(
+                            ch
+                    );
+
+            if (consonant != null) {
+
+                output.append(
+                        consonant
+                );
+
+                /*
+                 * Every Devanagari consonant normally
+                 * has an inherent "a".
+                 */
+
+                output.append("a");
+
+                previousWasConsonant =
+                        true;
+
+                continue;
+            }
+
+            String vowel =
+                    getDevanagariIndependentVowel(
+                            ch
+                    );
+
+            if (vowel != null) {
+
+                output.append(
+                        vowel
+                );
+
+                previousWasConsonant =
+                        false;
+
+                continue;
+            }
+
+            String matra =
+                    getDevanagariMatra(
+                            ch
+                    );
+
+            if (matra != null) {
+
+                if (previousWasConsonant &&
+                        output.length() > 0) {
+
+                    /*
+                     * Remove the inherent "a".
+                     */
+
+                    char last =
+                            output.charAt(
+                                    output.length() - 1
+                            );
+
+                    if (last == 'a') {
+
+                        output.deleteCharAt(
+                                output.length() - 1
+                        );
+                    }
+                }
+
+                output.append(
+                        matra
+                );
+
+                previousWasConsonant =
+                        false;
+
+                continue;
+            }
+
+            /*
+             * Halant / Virama
+             */
+
+            if (ch == '्') {
+
+                if (previousWasConsonant &&
+                        output.length() > 0) {
+
+                    char last =
+                            output.charAt(
+                                    output.length() - 1
+                            );
+
+                    if (last == 'a') {
+
+                        output.deleteCharAt(
+                                output.length() - 1
+                        );
+                    }
+                }
+
+                previousWasConsonant =
+                        false;
+
+                continue;
+            }
+
+            /*
+             * Anusvara / Chandrabindu
+             */
+
+            if (ch == 'ं' ||
+                    ch == 'ँ') {
+
+                output.append("n");
+
+                previousWasConsonant =
+                        false;
+
+                continue;
+            }
+
+            /*
+             * Visarga
+             */
+
+            if (ch == 'ः') {
+
+                output.append("h");
+
+                previousWasConsonant =
+                        false;
+
+                continue;
+            }
+
+            /*
+             * Nukta
+             */
+
+            if (ch == '़') {
+                continue;
+            }
+
+            /*
+             * Spaces and normal Latin characters.
+             */
+
+            if (Character.isWhitespace(ch)) {
+
+                output.append(" ");
+
+                previousWasConsonant =
+                        false;
+
+            } else {
+
+                output.append(ch);
+
+                previousWasConsonant =
+                        false;
+            }
+        }
+
+        return output.toString();
+    }
+
+    // =========================================================
+    // DEVANAGARI VOWELS
+    // =========================================================
+
+    private String getDevanagariIndependentVowel(
+            char ch
+    ) {
+
+        switch (ch) {
+
+            case 'अ':
+                return "a";
+
+            case 'आ':
+                return "aa";
+
+            case 'इ':
+                return "i";
+
+            case 'ई':
+                return "ee";
+
+            case 'उ':
+                return "u";
+
+            case 'ऊ':
+                return "oo";
+
+            case 'ऋ':
+                return "ri";
+
+            case 'ए':
+                return "e";
+
+            case 'ऐ':
+                return "ai";
+
+            case 'ओ':
+                return "o";
+
+            case 'औ':
+                return "au";
+
+            default:
+                return null;
+        }
+    }
+
+    // =========================================================
+    // DEVANAGARI MATRAS
+    // =========================================================
+
+    private String getDevanagariMatra(
+            char ch
+    ) {
+
+        switch (ch) {
+
+            case 'ा':
+                return "aa";
+
+            case 'ि':
+                return "i";
+
+            case 'ी':
+                return "ee";
+
+            case 'ु':
+                return "u";
+
+            case 'ू':
+                return "oo";
+
+            case 'ृ':
+                return "ri";
+
+            case 'े':
+                return "e";
+
+            case 'ै':
+                return "ai";
+
+            case 'ो':
+                return "o";
+
+            case 'ौ':
+                return "au";
+
+            default:
+                return null;
+        }
+    }
+
+    // =========================================================
+    // DEVANAGARI CONSONANTS
+    // =========================================================
+
+    private String getDevanagariConsonant(
+            char ch
+    ) {
+
+        switch (ch) {
+
+            case 'क':
+                return "k";
+
+            case 'ख':
+                return "kh";
+
+            case 'ग':
+                return "g";
+
+            case 'घ':
+                return "gh";
+
+            case 'ङ':
+                return "ng";
+
+            case 'च':
+                return "ch";
+
+            case 'छ':
+                return "chh";
+
+            case 'ज':
+                return "j";
+
+            case 'झ':
+                return "jh";
+
+            case 'ञ':
+                return "ny";
+
+            case 'ट':
+                return "t";
+
+            case 'ठ':
+                return "th";
+
+            case 'ड':
+                return "d";
+
+            case 'ढ':
+                return "dh";
+
+            case 'ण':
+                return "n";
+
+            case 'त':
+                return "t";
+
+            case 'थ':
+                return "th";
+
+            case 'द':
+                return "d";
+
+            case 'ध':
+                return "dh";
+
+            case 'न':
+                return "n";
+
+            case 'प':
+                return "p";
+
+            case 'फ':
+                return "ph";
+
+            case 'ब':
+                return "b";
+
+            case 'भ':
+                return "bh";
+
+            case 'म':
+                return "m";
+
+            case 'य':
+                return "y";
+
+            case 'र':
+                return "r";
+
+            case 'ल':
+                return "l";
+
+            case 'व':
+                return "v";
+
+            case 'श':
+                return "sh";
+
+            case 'ष':
+                return "sh";
+
+            case 'स':
+                return "s";
+
+            case 'ह':
+                return "h";
+
+            case 'क़':
+                return "q";
+
+            case 'ख़':
+                return "kh";
+
+            case 'ग़':
+                return "gh";
+
+            case 'ज़':
+                return "z";
+
+            case 'ड़':
+                return "r";
+
+            case 'ढ़':
+                return "rh";
+
+            case 'फ़':
+                return "f";
+
+            case 'य़':
+                return "y";
+
+            default:
+                return null;
+        }
+    }
+
+    // =========================================================
+    // STRING SIMILARITY
+    // =========================================================
+
+    private double calculateSimilarity(
+            String first,
+            String second
+    ) {
+
+        if (first == null ||
+                second == null) {
+
+            return 0.0;
+        }
+
+        if (first.equals(second)) {
+
+            return 1.0;
+        }
+
+        int maxLength =
+                Math.max(
+                        first.length(),
+                        second.length()
+                );
+
+        if (maxLength == 0) {
+            return 1.0;
+        }
+
+        int distance =
+                levenshteinDistance(
+                        first,
+                        second
+                );
+
+        return 1.0 -
+                ((double) distance /
+                        (double) maxLength);
+    }
+
+    // =========================================================
+    // LEVENSHTEIN DISTANCE
+    // =========================================================
+
+    private int levenshteinDistance(
+            String first,
+            String second
+    ) {
+
+        int lengthFirst =
+                first.length();
+
+        int lengthSecond =
+                second.length();
+
+        int[][] matrix =
+                new int[
+                        lengthFirst + 1
+                ][
+                        lengthSecond + 1
+                ];
+
+        for (int i = 0;
+                i <= lengthFirst;
+                i++) {
+
+            matrix[i][0] = i;
+        }
+
+        for (int j = 0;
+                j <= lengthSecond;
+                j++) {
+
+            matrix[0][j] = j;
+        }
+
+        for (int i = 1;
+                i <= lengthFirst;
+                i++) {
+
+            for (int j = 1;
+                    j <= lengthSecond;
+                    j++) {
+
+                int cost;
+
+                if (first.charAt(i - 1) ==
+                        second.charAt(j - 1)) {
+
+                    cost = 0;
+
+                } else {
+
+                    cost = 1;
+                }
+
+                int deletion =
+                        matrix[i - 1][j] + 1;
+
+                int insertion =
+                        matrix[i][j - 1] + 1;
+
+                int substitution =
+                        matrix[i - 1][j - 1] +
+                                cost;
+
+                matrix[i][j] =
+                        Math.min(
+                                Math.min(
+                                        deletion,
+                                        insertion
+                                ),
+                                substitution
+                        );
+            }
+        }
+
+        return matrix[
+                lengthFirst
+        ][
+                lengthSecond
+        ];
+    }
+
+    // =========================================================
+    // OPEN DIALER FOR CONTACT
+    // =========================================================
+
+    private void openDialerForNumber(
+            String phoneNumber
+    ) {
+
+        try {
+
+            Intent intent =
+                    new Intent(
+                            Intent.ACTION_DIAL,
+                            Uri.parse(
+                                    "tel:" +
+                                            Uri.encode(
+                                                    phoneNumber
+                                            )
+                            )
+                    );
+
+            activity.startActivity(intent);
+
+            sendActionResult(
+                    "call_contact",
+                    "success"
+            );
+
+        } catch (Exception e) {
+
+            sendActionResult(
+                    "call_contact",
                     "error"
             );
         }
@@ -724,7 +1902,9 @@ public class ZishuWebBridge {
         String setting =
                 type == null
                         ? ""
-                        : type.toLowerCase(Locale.ROOT).trim();
+                        : type.toLowerCase(
+                                Locale.ROOT
+                        ).trim();
 
         Intent intent = null;
 
@@ -1231,7 +2411,8 @@ public class ZishuWebBridge {
 
                 } catch (Exception e) {
 
-                    label = app.packageName;
+                    label =
+                            app.packageName;
                 }
 
                 if (!first) {
@@ -1262,11 +2443,11 @@ public class ZishuWebBridge {
             json.append("]");
 
             sendToJavaScript(
-                    "ZishuNativeInstalledAppsResult(" +
+                    "ZishuNativeInstalledAppsResult('" +
                             escapeJavaScript(
                                     json.toString()
                             ) +
-                            ")"
+                            "')"
             );
 
             sendActionResult(
@@ -1326,8 +2507,11 @@ public class ZishuWebBridge {
 
             String result =
                     "{"
-                            + "\"level\":" + level + ","
-                            + "\"charging\":" + charging
+                            + "\"level\":" +
+                            level +
+                            ","
+                            + "\"charging\":" +
+                            charging
                             + "}";
 
             sendToJavaScript(
@@ -1518,16 +2702,6 @@ public class ZishuWebBridge {
             String message
     ) {
 
-        /*
-         * Notification creation is intentionally delegated
-         * to the Android notification layer.
-         *
-         * This bridge safely reports that the native action
-         * was received. A full NotificationChannel based
-         * implementation can be added according to the
-         * target Android SDK.
-         */
-
         sendActionResult(
                 "notification",
                 "received"
@@ -1600,28 +2774,68 @@ public class ZishuWebBridge {
             int[] grantResults
     ) {
 
-        if (requestCode !=
+        if (requestCode ==
                 REQUEST_RECORD_AUDIO) {
+
+            if (grantResults != null &&
+                    grantResults.length > 0 &&
+                    grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED) {
+
+                sendToJavaScript(
+                        "ZishuNativePermissionGranted('microphone')"
+                );
+
+                startListening();
+
+            } else {
+
+                sendToJavaScript(
+                        "ZishuNativePermissionDenied('microphone')"
+                );
+            }
 
             return;
         }
 
-        if (grantResults != null &&
-                grantResults.length > 0 &&
-                grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED) {
+        if (requestCode ==
+                REQUEST_READ_CONTACTS) {
 
-            sendToJavaScript(
-                    "ZishuNativePermissionGranted('microphone')"
-            );
+            if (grantResults != null &&
+                    grantResults.length > 0 &&
+                    grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED) {
 
-            startListening();
+                sendToJavaScript(
+                        "ZishuNativePermissionGranted('contacts')"
+                );
 
-        } else {
+                if (pendingContactName != null &&
+                        pendingContactName.trim().length() > 0) {
 
-            sendToJavaScript(
-                    "ZishuNativePermissionDenied('microphone')"
-            );
+                    String name =
+                            pendingContactName;
+
+                    pendingContactName = null;
+
+                    findContactAndOpenDialer(
+                            name
+                    );
+                }
+
+            } else {
+
+                pendingContactName = null;
+
+                sendToJavaScript(
+                        "ZishuNativePermissionDenied('contacts')"
+                );
+
+                sendActionResult(
+                        "call_contact",
+                        "permission_denied"
+                );
+            }
         }
     }
 
@@ -1638,14 +2852,21 @@ public class ZishuWebBridge {
             return false;
         }
 
+        String lowerText =
+                text.toLowerCase(
+                        Locale.ROOT
+                );
+
         for (String word : words) {
 
             if (word == null) {
                 continue;
             }
 
-            if (text.contains(
-                    word.toLowerCase(Locale.ROOT)
+            if (lowerText.contains(
+                    word.toLowerCase(
+                            Locale.ROOT
+                    )
             )) {
 
                 return true;
@@ -1693,38 +2914,52 @@ public class ZishuWebBridge {
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")
                 .replace("\r", "\\r")
-                .replace("\t", "\\t");
+                .replace("\t", "\\t")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f");
     }
 
     // =========================================================
-    // CLEANUP
+    // DESTROY / CLEANUP
     // =========================================================
 
     public void destroy() {
 
+        if (textToSpeech != null) {
+
+            try {
+                textToSpeech.stop();
+            } catch (Exception ignored) {
+            }
+
+            try {
+                textToSpeech.shutdown();
+            } catch (Exception ignored) {
+            }
+
+            textToSpeech = null;
+        }
+
         if (speechRecognizer != null) {
 
             try {
+                speechRecognizer.stopListening();
+            } catch (Exception ignored) {
+            }
 
+            try {
+                speechRecognizer.cancel();
+            } catch (Exception ignored) {
+            }
+
+            try {
                 speechRecognizer.destroy();
-
             } catch (Exception ignored) {
             }
 
             speechRecognizer = null;
         }
 
-        if (textToSpeech != null) {
-
-            try {
-
-                textToSpeech.stop();
-                textToSpeech.shutdown();
-
-            } catch (Exception ignored) {
-            }
-
-            textToSpeech = null;
-        }
+        pendingContactName = null;
     }
 }
