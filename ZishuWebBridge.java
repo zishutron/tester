@@ -17,6 +17,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.telephony.SmsManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
@@ -36,14 +37,16 @@ public class ZishuWebBridge {
 
     private static final int REQUEST_RECORD_AUDIO = 1001;
     private static final int REQUEST_READ_CONTACTS = 1002;
+    private static final int REQUEST_SEND_SMS = 1003;
+    private static final int REQUEST_CALL_PHONE = 1004;
 
     private String pendingContactName = null;
+    private String pendingCallNumber = null;
+    private String pendingCallAction = null;
+    private String pendingSmsNumber = null;
+    private String pendingSmsMessage = null;
 
-    public ZishuWebBridge(
-            Activity activity,
-            WebView webView
-    ) {
-
+    public ZishuWebBridge(Activity activity, WebView webView) {
         this.activity = activity;
         this.webView = webView;
 
@@ -81,7 +84,6 @@ public class ZishuWebBridge {
                                         public void onStart(
                                                 String utteranceId
                                         ) {
-
                                             sendToJavaScript(
                                                     "ZishuNativeSpeakingStarted()"
                                             );
@@ -91,7 +93,6 @@ public class ZishuWebBridge {
                                         public void onDone(
                                                 String utteranceId
                                         ) {
-
                                             sendToJavaScript(
                                                     "ZishuNativeSpeakingFinished()"
                                             );
@@ -101,7 +102,6 @@ public class ZishuWebBridge {
                                         public void onError(
                                                 String utteranceId
                                         ) {
-
                                             sendToJavaScript(
                                                     "ZishuNativeSpeakingError('tts_error')"
                                             );
@@ -147,8 +147,7 @@ public class ZishuWebBridge {
             return;
         }
 
-        final String speechText =
-                text.trim();
+        final String speechText = text.trim();
 
         activity.runOnUiThread(
                 new Runnable() {
@@ -353,9 +352,10 @@ public class ZishuWebBridge {
     @JavascriptInterface
     public void startListening() {
 
-        if (activity.checkSelfPermission(
-                Manifest.permission.RECORD_AUDIO
-        ) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= 23 &&
+                activity.checkSelfPermission(
+                        Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED) {
 
             activity.requestPermissions(
                     new String[]{
@@ -613,7 +613,7 @@ public class ZishuWebBridge {
     }
 
     // =========================================================
-    // CALL BY PHONE NUMBER
+    // DIRECT CALL BY PHONE NUMBER
     // =========================================================
 
     @JavascriptInterface
@@ -630,31 +630,76 @@ public class ZishuWebBridge {
             return;
         }
 
-        try {
+        String number =
+                phoneNumber.trim();
 
-            String number =
-                    phoneNumber.trim();
+        if (Build.VERSION.SDK_INT >= 23 &&
+                activity.checkSelfPermission(
+                        Manifest.permission.CALL_PHONE
+                ) != PackageManager.PERMISSION_GRANTED) {
+
+            pendingCallNumber = number;
+            pendingCallAction = "make_call";
+
+            activity.requestPermissions(
+                    new String[]{
+                            Manifest.permission.CALL_PHONE
+                    },
+                    REQUEST_CALL_PHONE
+            );
+
+            return;
+        }
+
+        performDirectCall(
+                number,
+                "make_call"
+        );
+    }
+
+    // =========================================================
+    // DIRECT CALL EXECUTION
+    // =========================================================
+
+    private void performDirectCall(
+            String phoneNumber,
+            String action
+    ) {
+
+        try {
 
             Intent intent =
                     new Intent(
-                            Intent.ACTION_DIAL,
-                            Uri.parse(
-                                    "tel:" +
-                                            Uri.encode(number)
-                            )
+                            Intent.ACTION_CALL
                     );
+
+            intent.setData(
+                    Uri.parse(
+                            "tel:" +
+                                    Uri.encode(
+                                            phoneNumber
+                                    )
+                    )
+            );
 
             activity.startActivity(intent);
 
             sendActionResult(
-                    "make_call",
+                    action,
                     "success"
+            );
+
+        } catch (SecurityException e) {
+
+            sendActionResult(
+                    action,
+                    "permission_denied"
             );
 
         } catch (Exception e) {
 
             sendActionResult(
-                    "make_call",
+                    action,
                     "error"
             );
         }
@@ -693,9 +738,10 @@ public class ZishuWebBridge {
             return;
         }
 
-        if (activity.checkSelfPermission(
-                Manifest.permission.READ_CONTACTS
-        ) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= 23 &&
+                activity.checkSelfPermission(
+                        Manifest.permission.READ_CONTACTS
+                ) != PackageManager.PERMISSION_GRANTED) {
 
             pendingContactName = name;
 
@@ -745,25 +791,6 @@ public class ZishuWebBridge {
                             ContactsContract.CommonDataKinds.Phone.NUMBER
                     };
 
-            /*
-             * IMPORTANT:
-             *
-             * We do NOT depend only on:
-             *
-             * DISPLAY_NAME = query
-             *
-             * because voice may return:
-             *
-             * राहुल
-             *
-             * while contact is:
-             *
-             * Rahul
-             *
-             * Therefore we read contact names and compare
-             * normalized/transliterated versions ourselves.
-             */
-
             cursor =
                     activity.getContentResolver().query(
                             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -790,7 +817,6 @@ public class ZishuWebBridge {
                     );
 
             String bestNumber = null;
-            String bestName = null;
             int bestScore = 0;
 
             while (cursor.moveToNext()) {
@@ -850,25 +876,11 @@ public class ZishuWebBridge {
 
                     bestScore = score;
                     bestNumber = phoneNumber;
-                    bestName = savedName;
                 }
             }
 
             cursor.close();
             cursor = null;
-
-            /*
-             * Require a meaningful match.
-             *
-             * Exact normalized match:
-             * 100
-             *
-             * Token/contains match:
-             * 80-90
-             *
-             * Fuzzy match:
-             * 70+
-             */
 
             if (bestNumber != null &&
                     bestScore >= 70) {
@@ -924,36 +936,27 @@ public class ZishuWebBridge {
 
         if (query == null ||
                 contact == null) {
-
             return 0;
         }
 
         if (query.length() == 0 ||
                 contact.length() == 0) {
-
             return 0;
         }
 
-        // Exact normalized match
         if (query.equals(contact)) {
-
             return 100;
         }
 
-        // Contact contains query
         if (contact.contains(query)) {
-
             return 90;
         }
 
-        // Query contains contact
         if (query.contains(contact) &&
                 contact.length() >= 3) {
-
             return 85;
         }
 
-        // Compare individual name tokens
         String[] contactTokens =
                 contact.split(" ");
 
@@ -962,13 +965,23 @@ public class ZishuWebBridge {
 
         int tokenBest = 0;
 
-        for (String q : queryTokens) {
+        for (int i = 0;
+                i < queryTokens.length;
+                i++) {
+
+            String q =
+                    queryTokens[i];
 
             if (q.length() < 2) {
                 continue;
             }
 
-            for (String c : contactTokens) {
+            for (int j = 0;
+                    j < contactTokens.length;
+                    j++) {
+
+                String c =
+                        contactTokens[j];
 
                 if (c.length() < 2) {
                     continue;
@@ -992,7 +1005,6 @@ public class ZishuWebBridge {
             return tokenBest;
         }
 
-        // Fuzzy matching
         double similarity =
                 calculateSimilarity(
                         query,
@@ -1032,13 +1044,8 @@ public class ZishuWebBridge {
         String result =
                 text.trim();
 
-        /*
-         * Remove common calling phrases.
-         */
-
         String[] phrases =
                 new String[]{
-
                         "मुझे",
                         "मेरे",
                         "मेरी",
@@ -1048,7 +1055,6 @@ public class ZishuWebBridge {
                         "के",
                         "से",
                         "पर",
-
                         "कॉल",
                         "काल",
                         "फोन",
@@ -1060,7 +1066,6 @@ public class ZishuWebBridge {
                         "लगाना",
                         "मिलाओ",
                         "मिलाना",
-
                         "call",
                         "phone",
                         "please",
@@ -1081,26 +1086,12 @@ public class ZishuWebBridge {
                 i < phrases.length;
                 i++) {
 
-            String phrase =
-                    phrases[i];
-
             result =
                     result.replace(
-                            phrase,
+                            phrases[i],
                             " "
                     );
         }
-
-        result =
-                result.replace(
-                        "  ",
-                        " "
-                ).trim();
-
-        /*
-         * Repeat cleanup in case multiple spaces
-         * were created.
-         */
 
         while (result.contains("  ")) {
 
@@ -1131,28 +1122,15 @@ public class ZishuWebBridge {
                         Locale.ROOT
                 );
 
-        /*
-         * Remove calling command words first.
-         */
-
         value =
                 cleanContactQuery(
                         value
                 );
 
-        /*
-         * Convert Devanagari Hindi to Latin
-         * phonetic representation.
-         */
-
         value =
                 transliterateDevanagari(
                         value
                 );
-
-        /*
-         * Remove accents/diacritics.
-         */
 
         value =
                 Normalizer.normalize(
@@ -1166,47 +1144,17 @@ public class ZishuWebBridge {
                         ""
                 );
 
-        /*
-         * Keep only letters and numbers.
-         */
-
         value =
                 value.replaceAll(
                         "[^a-z0-9 ]",
                         " "
                 );
 
-        /*
-         * Normalize spaces.
-         */
-
         value =
                 value.replaceAll(
                         "\\s+",
                         " "
                 ).trim();
-
-        /*
-         * Normalize some common Hinglish variations.
-         */
-
-        value =
-                value.replace(
-                        "sh",
-                        "sh"
-                );
-
-        /*
-         * Devanagari transliteration can produce a
-         * final inherent "a":
-         *
-         * राहुल -> rahula
-         *
-         * Contact:
-         * Rahul -> rahul
-         *
-         * Remove final "a" for matching.
-         */
 
         String[] words =
                 value.split(" ");
@@ -1245,7 +1193,7 @@ public class ZishuWebBridge {
     }
 
     // =========================================================
-    // DEVANAGARI TO LATIN TRANSLITERATION
+    // DEVANAGARI TO LATIN
     // =========================================================
 
     private String transliterateDevanagari(
@@ -1278,15 +1226,7 @@ public class ZishuWebBridge {
 
             if (consonant != null) {
 
-                output.append(
-                        consonant
-                );
-
-                /*
-                 * Every Devanagari consonant normally
-                 * has an inherent "a".
-                 */
-
+                output.append(consonant);
                 output.append("a");
 
                 previousWasConsonant =
@@ -1302,9 +1242,7 @@ public class ZishuWebBridge {
 
             if (vowel != null) {
 
-                output.append(
-                        vowel
-                );
+                output.append(vowel);
 
                 previousWasConsonant =
                         false;
@@ -1322,10 +1260,6 @@ public class ZishuWebBridge {
                 if (previousWasConsonant &&
                         output.length() > 0) {
 
-                    /*
-                     * Remove the inherent "a".
-                     */
-
                     char last =
                             output.charAt(
                                     output.length() - 1
@@ -1339,19 +1273,13 @@ public class ZishuWebBridge {
                     }
                 }
 
-                output.append(
-                        matra
-                );
+                output.append(matra);
 
                 previousWasConsonant =
                         false;
 
                 continue;
             }
-
-            /*
-             * Halant / Virama
-             */
 
             if (ch == '्') {
 
@@ -1377,10 +1305,6 @@ public class ZishuWebBridge {
                 continue;
             }
 
-            /*
-             * Anusvara / Chandrabindu
-             */
-
             if (ch == 'ं' ||
                     ch == 'ँ') {
 
@@ -1392,10 +1316,6 @@ public class ZishuWebBridge {
                 continue;
             }
 
-            /*
-             * Visarga
-             */
-
             if (ch == 'ः') {
 
                 output.append("h");
@@ -1406,17 +1326,9 @@ public class ZishuWebBridge {
                 continue;
             }
 
-            /*
-             * Nukta
-             */
-
             if (ch == '़') {
                 continue;
             }
-
-            /*
-             * Spaces and normal Latin characters.
-             */
 
             if (Character.isWhitespace(ch)) {
 
@@ -1449,37 +1361,26 @@ public class ZishuWebBridge {
 
             case 'अ':
                 return "a";
-
             case 'आ':
                 return "aa";
-
             case 'इ':
                 return "i";
-
             case 'ई':
                 return "ee";
-
             case 'उ':
                 return "u";
-
             case 'ऊ':
                 return "oo";
-
             case 'ऋ':
                 return "ri";
-
             case 'ए':
                 return "e";
-
             case 'ऐ':
                 return "ai";
-
             case 'ओ':
                 return "o";
-
             case 'औ':
                 return "au";
-
             default:
                 return null;
         }
@@ -1497,34 +1398,24 @@ public class ZishuWebBridge {
 
             case 'ा':
                 return "aa";
-
             case 'ि':
                 return "i";
-
             case 'ी':
                 return "ee";
-
             case 'ु':
                 return "u";
-
             case 'ू':
                 return "oo";
-
             case 'ृ':
                 return "ri";
-
             case 'े':
                 return "e";
-
             case 'ै':
                 return "ai";
-
             case 'ो':
                 return "o";
-
             case 'ौ':
                 return "au";
-
             default:
                 return null;
         }
@@ -1542,127 +1433,86 @@ public class ZishuWebBridge {
 
             case 'क':
                 return "k";
-
             case 'ख':
                 return "kh";
-
             case 'ग':
                 return "g";
-
             case 'घ':
                 return "gh";
-
             case 'ङ':
                 return "ng";
-
             case 'च':
                 return "ch";
-
             case 'छ':
                 return "chh";
-
             case 'ज':
                 return "j";
-
             case 'झ':
                 return "jh";
-
             case 'ञ':
                 return "ny";
-
             case 'ट':
                 return "t";
-
             case 'ठ':
                 return "th";
-
             case 'ड':
                 return "d";
-
             case 'ढ':
                 return "dh";
-
             case 'ण':
                 return "n";
-
             case 'त':
                 return "t";
-
             case 'थ':
                 return "th";
-
             case 'द':
                 return "d";
-
             case 'ध':
                 return "dh";
-
             case 'न':
                 return "n";
-
             case 'प':
                 return "p";
-
             case 'फ':
                 return "ph";
-
             case 'ब':
                 return "b";
-
             case 'भ':
                 return "bh";
-
             case 'म':
                 return "m";
-
             case 'य':
                 return "y";
-
             case 'र':
                 return "r";
-
             case 'ल':
                 return "l";
-
             case 'व':
                 return "v";
-
             case 'श':
                 return "sh";
-
             case 'ष':
                 return "sh";
-
             case 'स':
                 return "s";
-
             case 'ह':
                 return "h";
-
             case 'क़':
                 return "q";
-
             case 'ख़':
                 return "kh";
-
             case 'ग़':
                 return "gh";
-
             case 'ज़':
                 return "z";
-
             case 'ड़':
                 return "r";
-
             case 'ढ़':
                 return "rh";
-
             case 'फ़':
                 return "f";
-
             case 'य़':
                 return "y";
-
             default:
                 return null;
         }
@@ -1684,7 +1534,6 @@ public class ZishuWebBridge {
         }
 
         if (first.equals(second)) {
-
             return 1.0;
         }
 
@@ -1794,44 +1643,53 @@ public class ZishuWebBridge {
     }
 
     // =========================================================
-    // OPEN DIALER FOR CONTACT
+    // DIRECT CALL CONTACT
     // =========================================================
 
     private void openDialerForNumber(
             String phoneNumber
     ) {
 
-        try {
-
-            Intent intent =
-                    new Intent(
-                            Intent.ACTION_DIAL,
-                            Uri.parse(
-                                    "tel:" +
-                                            Uri.encode(
-                                                    phoneNumber
-                                            )
-                            )
-                    );
-
-            activity.startActivity(intent);
+        if (phoneNumber == null ||
+                phoneNumber.trim().length() == 0) {
 
             sendActionResult(
                     "call_contact",
-                    "success"
+                    "invalid_number"
             );
 
-        } catch (Exception e) {
-
-            sendActionResult(
-                    "call_contact",
-                    "error"
-            );
+            return;
         }
+
+        String number =
+                phoneNumber.trim();
+
+        if (Build.VERSION.SDK_INT >= 23 &&
+                activity.checkSelfPermission(
+                        Manifest.permission.CALL_PHONE
+                ) != PackageManager.PERMISSION_GRANTED) {
+
+            pendingCallNumber = number;
+            pendingCallAction = "call_contact";
+
+            activity.requestPermissions(
+                    new String[]{
+                            Manifest.permission.CALL_PHONE
+                    },
+                    REQUEST_CALL_PHONE
+            );
+
+            return;
+        }
+
+        performDirectCall(
+                number,
+                "call_contact"
+        );
     }
 
     // =========================================================
-    // SMS COMPOSER
+    // DIRECT SMS
     // =========================================================
 
     @JavascriptInterface
@@ -1851,36 +1709,88 @@ public class ZishuWebBridge {
             return;
         }
 
-        try {
+        String number =
+                phoneNumber.trim();
 
-            String number =
-                    phoneNumber.trim();
+        String smsMessage =
+                message == null
+                        ? ""
+                        : message;
 
-            Intent intent =
-                    new Intent(
-                            Intent.ACTION_SENDTO
-                    );
+        if (Build.VERSION.SDK_INT >= 23 &&
+                activity.checkSelfPermission(
+                        Manifest.permission.SEND_SMS
+                ) != PackageManager.PERMISSION_GRANTED) {
 
-            intent.setData(
-                    Uri.parse(
-                            "smsto:" +
-                                    Uri.encode(number)
-                    )
+            pendingSmsNumber = number;
+            pendingSmsMessage = smsMessage;
+
+            activity.requestPermissions(
+                    new String[]{
+                            Manifest.permission.SEND_SMS
+                    },
+                    REQUEST_SEND_SMS
             );
 
-            if (message != null) {
+            return;
+        }
 
-                intent.putExtra(
-                        "sms_body",
-                        message
+        performDirectSms(
+                number,
+                smsMessage
+        );
+    }
+
+    // =========================================================
+    // DIRECT SMS EXECUTION
+    // =========================================================
+
+    private void performDirectSms(
+            String phoneNumber,
+            String message
+    ) {
+
+        try {
+
+            SmsManager smsManager =
+                    SmsManager.getDefault();
+
+            if (message.length() > 160) {
+
+                ArrayList<String> parts =
+                        smsManager.divideMessage(
+                                message
+                        );
+
+                smsManager.sendMultipartTextMessage(
+                        phoneNumber,
+                        null,
+                        parts,
+                        null,
+                        null
+                );
+
+            } else {
+
+                smsManager.sendTextMessage(
+                        phoneNumber,
+                        null,
+                        message,
+                        null,
+                        null
                 );
             }
-
-            activity.startActivity(intent);
 
             sendActionResult(
                     "send_sms",
                     "success"
+            );
+
+        } catch (SecurityException e) {
+
+            sendActionResult(
+                    "send_sms",
+                    "permission_denied"
             );
 
         } catch (Exception e) {
@@ -1922,9 +1832,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_WIFI_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "bluetooth",
                     "ब्लूटूथ"
@@ -1934,9 +1843,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_BLUETOOTH_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "display",
                     "screen",
@@ -1948,9 +1856,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_DISPLAY_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "sound",
                     "volume",
@@ -1963,9 +1870,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_SOUND_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "apps",
                     "applications",
@@ -1978,9 +1884,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_APPLICATION_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "notification",
                     "notifications",
@@ -2007,9 +1912,8 @@ public class ZishuWebBridge {
                                     Settings.ACTION_SETTINGS
                             );
                 }
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "location",
                     "gps",
@@ -2021,9 +1925,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_LOCATION_SOURCE_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "security",
                     "privacy",
@@ -2035,9 +1938,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_SECURITY_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "battery",
                     "बैटरी"
@@ -2057,9 +1959,8 @@ public class ZishuWebBridge {
                                     Settings.ACTION_SETTINGS
                             );
                 }
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "accessibility",
                     "असिस्टिव",
@@ -2070,9 +1971,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_ACCESSIBILITY_SETTINGS
                         );
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "language",
                     "languages",
@@ -2094,9 +1994,8 @@ public class ZishuWebBridge {
                                     Settings.ACTION_SETTINGS
                             );
                 }
-            }
 
-            else if (containsAny(
+            } else if (containsAny(
                     setting,
                     "developer",
                     "developer options",
@@ -2107,9 +2006,8 @@ public class ZishuWebBridge {
                         new Intent(
                                 Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS
                         );
-            }
 
-            else {
+            } else {
 
                 intent =
                         new Intent(
@@ -2185,9 +2083,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "com.whatsapp";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "youtube",
                 "you tube",
@@ -2197,9 +2094,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "com.google.android.youtube";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "instagram",
                 "insta",
@@ -2209,9 +2105,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "com.instagram.android";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "facebook",
                 "fb",
@@ -2220,9 +2115,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "com.facebook.katana";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "telegram",
                 "टेलीग्राम"
@@ -2230,9 +2124,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "org.telegram.messenger";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "gmail",
                 "जीमेल",
@@ -2241,9 +2134,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "com.google.android.gm";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "chrome",
                 "google chrome",
@@ -2253,9 +2145,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "com.android.chrome";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "maps",
                 "google maps",
@@ -2267,9 +2158,8 @@ public class ZishuWebBridge {
 
             packageName =
                     "com.google.android.apps.maps";
-        }
 
-        else if (containsAny(
+        } else if (containsAny(
                 name,
                 "settings",
                 "setting",
@@ -2774,6 +2664,10 @@ public class ZishuWebBridge {
             int[] grantResults
     ) {
 
+        // -----------------------------------------------------
+        // MICROPHONE
+        // -----------------------------------------------------
+
         if (requestCode ==
                 REQUEST_RECORD_AUDIO) {
 
@@ -2797,6 +2691,10 @@ public class ZishuWebBridge {
 
             return;
         }
+
+        // -----------------------------------------------------
+        // CONTACTS
+        // -----------------------------------------------------
 
         if (requestCode ==
                 REQUEST_READ_CONTACTS) {
@@ -2836,6 +2734,128 @@ public class ZishuWebBridge {
                         "permission_denied"
                 );
             }
+
+            return;
+        }
+
+        // -----------------------------------------------------
+        // DIRECT CALL
+        // -----------------------------------------------------
+
+        if (requestCode ==
+                REQUEST_CALL_PHONE) {
+
+            if (grantResults != null &&
+                    grantResults.length > 0 &&
+                    grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED) {
+
+                sendToJavaScript(
+                        "ZishuNativePermissionGranted('call')"
+                );
+
+                if (pendingCallNumber != null &&
+                        pendingCallNumber.trim().length() > 0) {
+
+                    String number =
+                            pendingCallNumber;
+
+                    String action =
+                            pendingCallAction;
+
+                    pendingCallNumber = null;
+                    pendingCallAction = null;
+
+                    if (action == null ||
+                            action.trim().length() == 0) {
+
+                        action = "make_call";
+                    }
+
+                    performDirectCall(
+                            number,
+                            action
+                    );
+                }
+
+            } else {
+
+                String action =
+                        pendingCallAction;
+
+                pendingCallNumber = null;
+                pendingCallAction = null;
+
+                if (action == null ||
+                        action.trim().length() == 0) {
+
+                    action = "make_call";
+                }
+
+                sendToJavaScript(
+                        "ZishuNativePermissionDenied('call')"
+                );
+
+                sendActionResult(
+                        action,
+                        "permission_denied"
+                );
+            }
+
+            return;
+        }
+
+        // -----------------------------------------------------
+        // DIRECT SMS
+        // -----------------------------------------------------
+
+        if (requestCode ==
+                REQUEST_SEND_SMS) {
+
+            if (grantResults != null &&
+                    grantResults.length > 0 &&
+                    grantResults[0] ==
+                            PackageManager.PERMISSION_GRANTED) {
+
+                sendToJavaScript(
+                        "ZishuNativePermissionGranted('sms')"
+                );
+
+                if (pendingSmsNumber != null) {
+
+                    String number =
+                            pendingSmsNumber;
+
+                    String message =
+                            pendingSmsMessage;
+
+                    pendingSmsNumber = null;
+                    pendingSmsMessage = null;
+
+                    performDirectSms(
+                            number,
+                            message == null
+                                    ? ""
+                                    : message
+                    );
+                }
+
+            } else {
+
+                pendingSmsNumber = null;
+                pendingSmsMessage = null;
+
+                sendToJavaScript(
+                        "ZishuNativePermissionDenied('sms')"
+                );
+
+                sendActionResult(
+                        "send_sms",
+                        "permission_denied"
+                );
+            }
+
+            return;
         }
     }
 
@@ -2857,7 +2877,12 @@ public class ZishuWebBridge {
                         Locale.ROOT
                 );
 
-        for (String word : words) {
+        for (int i = 0;
+                i < words.length;
+                i++) {
+
+            String word =
+                    words[i];
 
             if (word == null) {
                 continue;
@@ -2961,5 +2986,9 @@ public class ZishuWebBridge {
         }
 
         pendingContactName = null;
+        pendingCallNumber = null;
+        pendingCallAction = null;
+        pendingSmsNumber = null;
+        pendingSmsMessage = null;
     }
 }
