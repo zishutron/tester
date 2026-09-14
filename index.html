@@ -2684,22 +2684,22 @@
         // NATIVE ANDROID BRIDGE — Centralized API Wrapper
         // ============================================================
         const ZishuNative = (function() {
-            // Safe check for the native interface
+            // Internal helper: safe check for the native interface
             function isAvailable() {
                 return typeof window.ZishuAndroid !== 'undefined' && window.ZishuAndroid !== null;
             }
 
-            // Safe wrapper for any native call
+            // Internal helper: safe method caller
             function callNative(method, ...args) {
                 if (!isAvailable()) {
-                    console.warn('[Zishu Native] Attempted to call ' + method + ' but bridge is not available');
+                    console.warn('[Zishu Native] Bridge unavailable — cannot call: ' + method);
                     return null;
                 }
                 try {
                     if (typeof window.ZishuAndroid[method] === 'function') {
                         return window.ZishuAndroid[method](...args);
                     } else {
-                        console.warn('[Zishu Native] Method ' + method + ' not found on ZishuAndroid');
+                        console.warn('[Zishu Native] Method not found on bridge: ' + method);
                         return null;
                     }
                 } catch (e) {
@@ -2709,21 +2709,85 @@
             }
 
             return {
+                // -- Availability
                 isAvailable,
+
+                // -- Speech
                 startListening: () => callNative('startListening'),
                 stopListening: () => callNative('stopListening'),
                 speak: (text) => callNative('speak', text),
                 stopSpeaking: () => callNative('stopSpeaking'),
+                isSpeaking: () => {
+                    if (!isAvailable()) return false;
+                    try {
+                        if (typeof window.ZishuAndroid.isSpeaking === 'function') {
+                            return !!window.ZishuAndroid.isSpeaking();
+                        }
+                        return false;
+                    } catch (e) {
+                        console.error('[Zishu Native] isSpeaking error:', e);
+                        return false;
+                    }
+                },
+
+                // -- Apps
                 openAppByName: (name) => callNative('openAppByName', name),
                 openApp: (packageName) => callNative('openApp', packageName),
+
+                // -- Web / Maps / URL
                 searchWeb: (query) => callNative('searchWeb', query),
+                openUrl: (url) => callNative('openUrl', url),
+                openMaps: (query) => callNative('openMaps', query),
+
+                // -- Communication
                 makeCall: (phoneNumber) => callNative('makeCall', phoneNumber),
                 sendSms: (phoneNumber, message) => callNative('sendSms', phoneNumber, message),
+
+                // -- Settings
                 openSettings: (type) => callNative('openSettings', type),
+
+                // -- Apps discovery
                 getInstalledApps: () => callNative('getInstalledApps'),
+
+                // -- Notifications
                 showNotification: (title, message) => callNative('showNotification', title, message),
+                getNotifications: () => callNative('getNotifications'),
+                dismissNotification: (id) => callNative('dismissNotification', id),
+                openNotificationSettings: () => callNative('openNotificationSettings'),
+
+                // -- Device info
+                getDeviceInfo: () => callNative('getDeviceInfo'),
+                getBatteryInfo: () => callNative('getBatteryInfo'),
+                getCurrentTime: () => callNative('getCurrentTime'),
+                getCurrentDate: () => callNative('getCurrentDate'),
+                getNetworkStatus: () => callNative('getNetworkStatus'),
+                getLocation: () => callNative('getLocation'),
+
+                // -- Alarms / Reminders
+                setAlarm: (timestamp, label) => callNative('setAlarm', timestamp, label),
+                setReminder: (timestamp, text) => callNative('setReminder', timestamp, text),
+                cancelAlarm: (id) => callNative('cancelAlarm', id),
+                cancelReminder: (id) => callNative('cancelReminder', id),
+
+                // -- Device controls
+                setFlashlight: (enabled) => callNative('setFlashlight', enabled),
+                setVolume: (type, level) => callNative('setVolume', type, level),
+                getVolume: (type) => callNative('getVolume', type),
+                openCamera: () => callNative('openCamera'),
+                openGallery: () => callNative('openGallery'),
+                vibrate: (duration) => callNative('vibrate', duration),
+
+                // -- Sharing / Clipboard
+                shareText: (text) => callNative('shareText', text),
+                copyToClipboard: (text) => callNative('copyToClipboard', text),
+                getClipboard: () => callNative('getClipboard'),
+
+                // -- Wake word
                 startWakeWord: () => callNative('startWakeWord'),
-                stopWakeWord: () => callNative('stopWakeWord')
+                stopWakeWord: () => callNative('stopWakeWord'),
+
+                // -- App settings
+                openAppSettings: (packageName) => callNative('openAppSettings', packageName)
             };
         })();
 
@@ -2764,8 +2828,13 @@
             if (hasNative) {
                 console.log('[Zishu Native] Bridge available');
             } else {
-                console.log('[Zishu Native] Bridge not available — using browser fallback');
+                console.log('[Zishu Native] Bridge unavailable — using browser fallback');
             }
+
+            // ============================================================
+            // PENDING CONFIRMATION STATE
+            // ============================================================
+            let pendingNativeAction = null;
 
             // ============================================================
             // DOM REFS
@@ -2787,7 +2856,7 @@
             }
 
             // ============================================================
-            // ACTION HANDLERS (preserved)
+            // ACTION HANDLERS (preserved local actions)
             // ============================================================
             function handleActions(query) {
                 var q = query.toLowerCase().trim();
@@ -3334,13 +3403,11 @@
 
                 addToolMessage('Opening ' + siteName + '...');
 
-                // If native bridge exists, use native searchWeb for safer handling
                 if (hasNative) {
                     ZishuNative.searchWeb(url);
                     return true;
                 }
 
-                // Browser fallback
                 try {
                     window.location.assign(url);
                     return true;
@@ -3411,7 +3478,6 @@
                 isStopped = true;
                 isSpeakingNow = false;
 
-                // Stop native speaking if available
                 if (hasNative) {
                     ZishuNative.stopSpeaking();
                 }
@@ -3534,7 +3600,6 @@
             function startListening() {
                 clearRestartTimer();
 
-                // If native bridge is available, use native listening
                 if (hasNative) {
                     console.log('[Zishu Native] Starting native listening');
                     ZishuNative.startListening();
@@ -3542,7 +3607,6 @@
                     return;
                 }
 
-                // Browser fallback
                 if (!recognition) {
                     recognition = initSpeechRecognition();
                     if (!recognition) return;
@@ -3558,7 +3622,6 @@
             function stopListening() {
                 clearRestartTimer();
 
-                // If native bridge is available, stop native listening
                 if (hasNative) {
                     ZishuNative.stopListening();
                     if (!isProcessing) {
@@ -3567,7 +3630,6 @@
                     return;
                 }
 
-                // Browser fallback
                 if (recognition) {
                     try { recognition.stop(); } catch (e) {}
                 }
@@ -3627,7 +3689,6 @@
                 }
 
                 return new Promise(function(resolve) {
-                    // If native bridge is available, use native TTS
                     if (hasNative) {
                         console.log('[Zishu Native] Using native TTS');
                         utteranceResolve = resolve;
@@ -3648,7 +3709,6 @@
                         return;
                     }
 
-                    // Browser fallback
                     try {
                         if (!window.speechSynthesis) {
                             resolve();
@@ -3791,7 +3851,7 @@
             }
 
             function forceLoadVoices() {
-                if (hasNative) return; // Not needed for native
+                if (hasNative) return;
                 if (!window.speechSynthesis) return;
 
                 try {
@@ -3875,6 +3935,547 @@
                 return msgDiv;
             }
 
+            // ============================================================
+            // CONFIRMATION HELPERS
+            // ============================================================
+            function isConfirmationYes(query) {
+                var q = query.toLowerCase().trim();
+                var yes = ['yes', 'haan', 'han', 'ha', 'हाँ', 'हां', 'ok', 'okay', 'confirm', 'kar do', 'call karo', 'send it', 'send karo', 'bhej do', 'karo'];
+                return yes.some(function(w) { return q === w || q.includes(w); });
+            }
+
+            function isConfirmationNo(query) {
+                var q = query.toLowerCase().trim();
+                var no = ['no', 'nahi', 'नहीं', 'cancel', 'mat karo', 'band karo', 'ruk jao', 'rehne do', 'chhodo'];
+                return no.some(function(w) { return q === w || q.includes(w); });
+            }
+
+            function executePendingAction() {
+                if (!pendingNativeAction) return;
+
+                var action = pendingNativeAction;
+                pendingNativeAction = null;
+
+                console.log('[Zishu Native] Executing confirmed action:', action.type);
+
+                if (action.type === 'make_call') {
+                    if (hasNative) {
+                        var r = ZishuNative.makeCall(action.data.phoneNumber);
+                        if (r === null) {
+                            var msg = 'Call feature available nahi hai.';
+                            addActionMessage(msg);
+                            speakText(msg);
+                        } else {
+                            var okMsg = 'Call kar rahi hoon ' + action.data.phoneNumber + ' par.';
+                            addActionMessage(okMsg);
+                            speakText(okMsg);
+                        }
+                    } else {
+                        var msg2 = 'Native call support is not available in this browser.';
+                        addActionMessage(msg2);
+                        speakText(msg2);
+                    }
+                } else if (action.type === 'send_sms') {
+                    if (hasNative) {
+                        var r2 = ZishuNative.sendSms(action.data.phoneNumber, action.data.message);
+                        if (r2 === null) {
+                            var msg3 = 'SMS feature available nahi hai.';
+                            addActionMessage(msg3);
+                            speakText(msg3);
+                        } else {
+                            var okMsg2 = 'SMS bhej rahi hoon.';
+                            addActionMessage(okMsg2);
+                            speakText(okMsg2);
+                        }
+                    } else {
+                        var msg4 = 'Native SMS support is not available in this browser.';
+                        addActionMessage(msg4);
+                        speakText(msg4);
+                    }
+                }
+
+                isProcessing = false;
+                if (!isStopped) {
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1000);
+                }
+            }
+
+            function cancelPendingAction() {
+                if (!pendingNativeAction) return;
+                pendingNativeAction = null;
+                var msg = 'Theek hai, cancel kar diya.';
+                addActionMessage(msg);
+                speakText(msg);
+                isProcessing = false;
+                setOrbState(STATE.IDLE);
+                scheduleRestart(1000);
+            }
+
+            // ============================================================
+            // NATIVE COMMAND DETECTION
+            // ============================================================
+            function detectNativeCommand(query) {
+                var q = query.toLowerCase().trim();
+
+                // ---------- OPEN APP ----------
+                var openWords = ['open', 'kholo', 'khol', 'khol do', 'khol de', 'open karo', 'open kar', 'chalao', 'chala do',
+                    'launch', 'start', 'खोलो', 'खोल', 'खोल दो', 'खोल दे', 'चलाओ', 'चला दो', 'शुरू करो', 'शुरू कर', 'ओपन', 'ओपन करो'
+                ];
+
+                var appAliases = {
+                    'whatsapp': 'WhatsApp',
+                    'whats app': 'WhatsApp',
+                    'व्हाट्सएप': 'WhatsApp',
+                    'व्हाट्सऐप': 'WhatsApp',
+                    'वाट्सएप': 'WhatsApp',
+                    'youtube': 'YouTube',
+                    'you tube': 'YouTube',
+                    'यूट्यूब': 'YouTube',
+                    'यूटुब': 'YouTube',
+                    'instagram': 'Instagram',
+                    'insta': 'Instagram',
+                    'इंस्टाग्राम': 'Instagram',
+                    'इंस्टा': 'Instagram',
+                    'facebook': 'Facebook',
+                    'fb': 'Facebook',
+                    'फेसबुक': 'Facebook',
+                    'telegram': 'Telegram',
+                    'टेलीग्राम': 'Telegram',
+                    'gmail': 'Gmail',
+                    'जीमेल': 'Gmail',
+                    'chrome': 'Chrome',
+                    'क्रोम': 'Chrome',
+                    'google chrome': 'Chrome',
+                    'गूगल क्रोम': 'Chrome',
+                    'maps': 'Maps',
+                    'google maps': 'Maps',
+                    'गूगल मैप': 'Maps',
+                    'गूगल मैप्स': 'Maps',
+                    'settings': 'Settings',
+                    'setting': 'Settings',
+                    'सेटिंग': 'Settings',
+                    'सेटिंग्स': 'Settings',
+                    'camera': 'Camera',
+                    'कैमरा': 'Camera',
+                    'gallery': 'Gallery',
+                    'गैलरी': 'Gallery',
+                    'phone': 'Phone',
+                    'फोन': 'Phone',
+                    'contacts': 'Contacts',
+                    'कॉन्टैक्ट्स': 'Contacts',
+                    'calculator': 'Calculator',
+                    'कैलकुलेटर': 'Calculator',
+                    'clock': 'Clock',
+                    'घड़ी': 'Clock',
+                    'calendar': 'Calendar',
+                    'कैलेंडर': 'Calendar',
+                    'spotify': 'Spotify',
+                    'स्पॉटिफाई': 'Spotify',
+                    'netflix': 'Netflix',
+                    'नेटफ्लिक्स': 'Netflix',
+                    'paytm': 'Paytm',
+                    'पेटीएम': 'Paytm',
+                    'phonepe': 'PhonePe',
+                    'फोनपे': 'PhonePe',
+                    'gpay': 'Google Pay',
+                    'google pay': 'Google Pay',
+                    'गूगल पे': 'Google Pay'
+                };
+
+                var hasOpenIntent = openWords.some(function(w) { return q.includes(w); });
+
+                if (hasOpenIntent) {
+                    for (var alias in appAliases) {
+                        if (appAliases.hasOwnProperty(alias)) {
+                            if (q.includes(alias)) {
+                                return {
+                                    type: 'open_app',
+                                    data: { appName: appAliases[alias], rawName: alias }
+                                };
+                            }
+                        }
+                    }
+
+                    // Natural phrases like "mujhe whatsapp par le chalo"
+                    var naturalAppMatch = q.match(/(?:mujhe|मुझे)\s+([a-z\u0900-\u097F]+)\s+(?:par|पर|pe|पे)/);
+                    if (naturalAppMatch && naturalAppMatch[1]) {
+                        var natName = naturalAppMatch[1];
+                        for (var alias2 in appAliases) {
+                            if (appAliases.hasOwnProperty(alias2)) {
+                                if (alias2.includes(natName) || natName.includes(alias2)) {
+                                    return {
+                                        type: 'open_app',
+                                        data: { appName: appAliases[alias2], rawName: alias2 }
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ---------- WEB SEARCH ----------
+                var searchTriggers = ['search karo', 'search kar', 'google par search', 'google pe search', 'web par search',
+                    'search for', 'search the web', 'internet par search', 'सर्च करो', 'सर्च कर', 'गूगल पर सर्च', 'ढूंढो', 'ढूढो', 'खोजो', 'खोज करो'
+                ];
+
+                var hasSearchIntent = searchTriggers.some(function(w) { return q.includes(w); });
+                if (hasSearchIntent) {
+                    var searchQuery = q;
+                    searchTriggers.forEach(function(t) {
+                        searchQuery = searchQuery.split(t).join(' ');
+                    });
+                    searchQuery = searchQuery.replace(/\b(google|par|pe|me|mein|for|the|web|internet|पर|में|पे)\b/g, ' ').trim();
+                    if (searchQuery.length > 0) {
+                        return { type: 'web_search', data: { query: searchQuery } };
+                    } else {
+                        return { type: 'web_search', data: { query: q } };
+                    }
+                }
+
+                // ---------- OPEN SETTINGS ----------
+                var settingsWords = ['settings kholo', 'settings open', 'setting kholo', 'सेटिंग खोलो', 'सेटिंग्स खोलो',
+                    'wifi settings', 'bluetooth settings', 'display settings', 'sound settings', 'wifi खोलो', 'bluetooth खोलो'
+                ];
+                var hasSettingsIntent = settingsWords.some(function(w) { return q.includes(w); });
+                if (hasSettingsIntent) {
+                    var settingType = 'general';
+                    if (q.includes('wifi') || q.includes('वाईफाई') || q.includes('wi-fi')) settingType = 'wifi';
+                    else if (q.includes('bluetooth') || q.includes('ब्लूटूथ')) settingType = 'bluetooth';
+                    else if (q.includes('display') || q.includes('डिस्प्ले')) settingType = 'display';
+                    else if (q.includes('sound') || q.includes('साउंड') || q.includes('आवाज़')) settingType = 'sound';
+                    else if (q.includes('notification') || q.includes('नोटिफिकेशन')) settingType = 'notifications';
+                    else if (q.includes('location') || q.includes('लोकेशन')) settingType = 'location';
+                    else if (q.includes('battery') || q.includes('बैटरी')) settingType = 'battery';
+                    else if (q.includes('app') || q.includes('ऐप')) settingType = 'applications';
+                    return { type: 'open_settings', data: { settingType: settingType } };
+                }
+
+                // ---------- CALL ----------
+                var callWords = ['call karo', 'phone karo', 'call kar', 'call lagao', 'phone lagao', 'call', 'कॉल करो', 'कॉल कर', 'फोन करो', 'फोन कर'];
+                var hasCallIntent = callWords.some(function(w) { return q.includes(w); });
+                if (hasCallIntent) {
+                    var phoneMatch = q.match(/(\+?\d[\d\s\-]{7,15}\d)/);
+                    if (phoneMatch) {
+                        var phoneNumber = phoneMatch[1].replace(/[\s\-]/g, '');
+                        if (phoneNumber.length >= 8) {
+                            return { type: 'make_call', data: { phoneNumber: phoneNumber }, needsConfirmation: true };
+                        }
+                    }
+                    return { type: 'make_call_need_number', data: {} };
+                }
+
+                // ---------- SMS ----------
+                var smsWords = ['sms bhejo', 'message bhejo', 'sms karo', 'message karo', 'एसएमएस भेजो', 'मैसेज भेजो', 'संदेश भेजो', 'text bhejo'];
+                var hasSmsIntent = smsWords.some(function(w) { return q.includes(w); });
+                if (hasSmsIntent) {
+                    var smsPhoneMatch = q.match(/(\+?\d[\d\s\-]{7,15}\d)/);
+                    if (smsPhoneMatch) {
+                        var smsPhone = smsPhoneMatch[1].replace(/[\s\-]/g, '');
+                        var msgMatch = q.match(/["'"'](.+?)["'"']/);
+                        var msgText = msgMatch ? msgMatch[1] : null;
+                        if (!msgText) {
+                            return { type: 'send_sms_need_message', data: { phoneNumber: smsPhone } };
+                        }
+                        return { type: 'send_sms', data: { phoneNumber: smsPhone, message: msgText }, needsConfirmation: true };
+                    }
+                    return { type: 'send_sms_need_number', data: {} };
+                }
+
+                // ---------- MAPS ----------
+                var mapsWords = ['maps par', 'maps mein', 'google maps', 'गूगल मैप', 'मैप्स में', 'मैप्स पर', 'navigate to', 'navigation'];
+                var hasMapsIntent = mapsWords.some(function(w) { return q.includes(w); });
+                if (hasMapsIntent) {
+                    var mapQuery = q.replace(/(maps|map|google maps|गूगल मैप|मैप्स|par|pe|mein|में|पर|kholo|खोलो|open|show|search|karo|करो)/g, ' ').trim();
+                    return { type: 'open_maps', data: { query: mapQuery || '' } };
+                }
+
+                // ---------- BATTERY ----------
+                if (q.includes('battery') || q.includes('बैटरी')) {
+                    if (q.includes('kitni') || q.includes('कितनी') || q.includes('percentage') || q.includes('percent') || q.includes('batao') || q.includes('बताओ')) {
+                        return { type: 'get_battery', data: {} };
+                    }
+                }
+
+                // ---------- DEVICE INFO ----------
+                if ((q.includes('phone') || q.includes('device') || q.includes('फोन') || q.includes('डिवाइस')) &&
+                    (q.includes('info') || q.includes('information') || q.includes('जानकारी') || q.includes('batao') || q.includes('बताओ'))) {
+                    return { type: 'get_device_info', data: {} };
+                }
+
+                // ---------- LOCATION ----------
+                if (q.includes('meri location') || q.includes('मेरी लोकेशन') || q.includes('main kaha') || q.includes('मैं कहा') ||
+                    q.includes('where am i') || q.includes('current location') || q.includes('my location')) {
+                    return { type: 'get_location', data: {} };
+                }
+
+                // ---------- FLASHLIGHT ----------
+                if (q.includes('flashlight') || q.includes('torch') || q.includes('टॉर्च') || q.includes('फ्लैशलाइट')) {
+                    if (q.includes('on') || q.includes('चालू') || q.includes('chalu') || q.includes('kholo') || q.includes('खोलो')) {
+                        return { type: 'flashlight_on', data: {} };
+                    }
+                    if (q.includes('off') || q.includes('बंद') || q.includes('band')) {
+                        return { type: 'flashlight_off', data: {} };
+                    }
+                }
+
+                return null;
+            }
+
+            // ============================================================
+            // EXECUTE NATIVE COMMAND
+            // ============================================================
+            function executeNativeCommand(cmd) {
+                if (!cmd) return false;
+
+                console.log('[Zishu Native] Command detected:', cmd.type);
+
+                // ---- open_app ----
+                if (cmd.type === 'open_app') {
+                    var appName = cmd.data.appName;
+                    console.log('[Zishu Native] Opening app:', appName);
+
+                    if (hasNative) {
+                        var result = ZishuNative.openAppByName(appName);
+                        // If bridge returned null, treat as unavailable
+                        if (result === null) {
+                            var msg = appName + ' kholne ki koshish kar rahi hoon. Agar open na ho, to app installed nahi ho sakti.';
+                            addActionMessage(msg);
+                            speakText(msg);
+                        } else {
+                            addActionMessage(appName + ' खोल रही हूँ।');
+                        }
+                    } else {
+                        // Browser fallback: for known web apps open website
+                        var siteKey = null;
+                        for (var k in SITE_ALIASES) {
+                            if (SITE_ALIASES.hasOwnProperty(k)) {
+                                if (SITE_ALIASES[k].some(function(a) { return cmd.data.rawName && a.includes(cmd.data.rawName); }) ||
+                                    k === cmd.data.rawName ||
+                                    k === appName.toLowerCase()) {
+                                    siteKey = k;
+                                    break;
+                                }
+                            }
+                        }
+                        if (siteKey && WEBSITE_MAP[siteKey]) {
+                            addActionMessage('Opening ' + appName + ' in browser...');
+                            try {
+                                window.open(WEBSITE_MAP[siteKey], '_blank');
+                            } catch (e) {
+                                var m = appName + ' browser mein available nahi hai. Native app ke liye Android app use karein.';
+                                addActionMessage(m);
+                                speakText(m);
+                            }
+                        } else {
+                            var m2 = appName + ' ko open karne ke liye Zishu Android app use karein.';
+                            addActionMessage(m2);
+                            speakText(m2);
+                        }
+                    }
+
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- web_search ----
+                if (cmd.type === 'web_search') {
+                    var searchQ = cmd.data.query;
+                    console.log('[Zishu Native] Web search requested');
+
+                    if (hasNative) {
+                        var r = ZishuNative.searchWeb(searchQ);
+                        if (r === null) {
+                            var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ);
+                            window.open(url, '_blank');
+                        }
+                        addActionMessage('Search खोल रही हूँ।');
+                    } else {
+                        var url2 = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ);
+                        window.open(url2, '_blank');
+                        addActionMessage('Search खोल रही हूँ।');
+                    }
+
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- open_settings ----
+                if (cmd.type === 'open_settings') {
+                    console.log('[Zishu Native] Opening settings:', cmd.data.settingType);
+                    if (hasNative) {
+                        var rs = ZishuNative.openSettings(cmd.data.settingType);
+                        if (rs === null) {
+                            addActionMessage('Settings kholne ki koshish kar rahi hoon.');
+                        } else {
+                            addActionMessage('Settings खोल रही हूँ।');
+                        }
+                    } else {
+                        addActionMessage('Settings sirf Android app mein available hai.');
+                    }
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- open_maps ----
+                if (cmd.type === 'open_maps') {
+                    console.log('[Zishu Native] Opening maps:', cmd.data.query);
+                    if (hasNative) {
+                        var rm = ZishuNative.openMaps(cmd.data.query || '');
+                        if (rm === null) {
+                            var mapUrl = cmd.data.query ?
+                                'https://www.google.com/maps/search/' + encodeURIComponent(cmd.data.query) :
+                                'https://www.google.com/maps';
+                            window.open(mapUrl, '_blank');
+                        }
+                    } else {
+                        var mapUrl2 = cmd.data.query ?
+                            'https://www.google.com/maps/search/' + encodeURIComponent(cmd.data.query) :
+                            'https://www.google.com/maps';
+                        window.open(mapUrl2, '_blank');
+                    }
+                    addActionMessage('Maps खोल रही हूँ।');
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- make_call ----
+                if (cmd.type === 'make_call') {
+                    // Needs confirmation
+                    pendingNativeAction = { type: 'make_call', data: cmd.data };
+                    var confMsg = 'Main ' + cmd.data.phoneNumber + ' par call karne wali hoon. Confirm karein? (haan / nahi)';
+                    addActionMessage(confMsg);
+                    speakText(confMsg);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1500);
+                    return true;
+                }
+
+                if (cmd.type === 'make_call_need_number') {
+                    var msg = 'Kis number par call karna hai? Number bataiye.';
+                    addActionMessage(msg);
+                    speakText(msg);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- send_sms ----
+                if (cmd.type === 'send_sms') {
+                    pendingNativeAction = { type: 'send_sms', data: cmd.data };
+                    var confMsg2 = cmd.data.phoneNumber + ' ko message bhejna hai: "' + cmd.data.message + '". Confirm karein? (haan / nahi)';
+                    addActionMessage(confMsg2);
+                    speakText(confMsg2);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1500);
+                    return true;
+                }
+
+                if (cmd.type === 'send_sms_need_message') {
+                    var msg3 = 'Message kya bhejna hai? Bataiye.';
+                    addActionMessage(msg3);
+                    speakText(msg3);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                if (cmd.type === 'send_sms_need_number') {
+                    var msg4 = 'Kis number par SMS bhejna hai? Number bataiye.';
+                    addActionMessage(msg4);
+                    speakText(msg4);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- battery ----
+                if (cmd.type === 'get_battery') {
+                    if (hasNative) {
+                        var b = ZishuNative.getBatteryInfo();
+                        if (b === null) {
+                            var msg5 = 'Battery info sirf Android app mein available hai.';
+                            addActionMessage(msg5);
+                            speakText(msg5);
+                        }
+                    } else {
+                        var msg6 = 'Battery info sirf Android app mein available hai.';
+                        addActionMessage(msg6);
+                        speakText(msg6);
+                    }
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- device info ----
+                if (cmd.type === 'get_device_info') {
+                    if (hasNative) {
+                        ZishuNative.getDeviceInfo();
+                        addActionMessage('Device info nikal rahi hoon...');
+                    } else {
+                        var msg7 = 'Device info sirf Android app mein available hai.';
+                        addActionMessage(msg7);
+                        speakText(msg7);
+                    }
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- location ----
+                if (cmd.type === 'get_location') {
+                    if (hasNative) {
+                        ZishuNative.getLocation();
+                        addActionMessage('Aapki location nikal rahi hoon...');
+                    } else {
+                        var msg8 = 'Location sirf Android app mein available hai.';
+                        addActionMessage(msg8);
+                        speakText(msg8);
+                    }
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                // ---- flashlight ----
+                if (cmd.type === 'flashlight_on' || cmd.type === 'flashlight_off') {
+                    if (hasNative) {
+                        ZishuNative.setFlashlight(cmd.type === 'flashlight_on');
+                        addActionMessage(cmd.type === 'flashlight_on' ? 'Flashlight on kar rahi hoon.' : 'Flashlight off kar rahi hoon.');
+                    } else {
+                        var msg9 = 'Flashlight sirf Android app mein available hai.';
+                        addActionMessage(msg9);
+                        speakText(msg9);
+                    }
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return true;
+                }
+
+                return false;
+            }
+
+            // ============================================================
+            // HANDLE USER QUERY (central pipeline)
+            // ============================================================
             function handleUserQuery(query) {
                 if (isProcessing) return;
                 isProcessing = true;
@@ -3896,6 +4497,28 @@
                 chatContainer.appendChild(userDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
 
+                // 1. Check pending confirmation
+                if (pendingNativeAction) {
+                    if (isConfirmationYes(query)) {
+                        executePendingAction();
+                        return;
+                    } else if (isConfirmationNo(query)) {
+                        cancelPendingAction();
+                        return;
+                    }
+                    // If neither, clear pending and continue
+                    pendingNativeAction = null;
+                }
+
+                // 2. Native commands
+                var nativeCmd = detectNativeCommand(query);
+                if (nativeCmd) {
+                    if (executeNativeCommand(nativeCmd)) {
+                        return;
+                    }
+                }
+
+                // 3. Existing local actions
                 var actionResult = handleActions(query);
                 if (actionResult) {
                     addActionMessage(actionResult);
@@ -3909,6 +4532,7 @@
                     return;
                 }
 
+                // 4. Existing local answers
                 var localAnswer = getLocalAnswer(query);
                 if (localAnswer) {
                     streamResponse(localAnswer);
@@ -3920,6 +4544,7 @@
                     return;
                 }
 
+                // 5. Existing local commands (website opening)
                 var localCommand = detectLocalCommand(query);
                 if (localCommand && localCommand.type === 'open_website') {
                     openWebsiteDirectly(localCommand.value);
@@ -3929,6 +4554,7 @@
                     return;
                 }
 
+                // 6. AI backend
                 try {
                     var timestampedQuery = query + ' (Current date: ' + new Date().toISOString().split('T')[0] + ')';
 
@@ -4013,6 +4639,7 @@
                     orbStatus.textContent = 'Microphone error';
                     orbSub.textContent = message || 'Please try again';
                     setOrbState(STATE.IDLE);
+                    isProcessing = false;
                 } catch (e) {
                     console.error('[Zishu Native] ListeningError error:', e);
                 }
@@ -4027,7 +4654,6 @@
                     if (!text || !text.trim()) return;
                     text = text.trim();
 
-                    // Duplicate prevention: ignore same result within 1500ms
                     var now = Date.now();
                     if (text === lastNativeResult && (now - lastNativeResultTime) < 1500) {
                         console.log('[Zishu Native] Duplicate result ignored:', text);
@@ -4038,7 +4664,6 @@
 
                     console.log('[Zishu Native] Speech result:', text);
 
-                    // Handle stop commands gracefully
                     if (isStopCommand(text)) {
                         if (isSpeakingNow || isProcessing || state === STATE.SPEAKING) {
                             stopCurrentResponse();
@@ -4046,7 +4671,6 @@
                         }
                     }
 
-                    // Process the query through the existing pipeline
                     handleUserQuery(text);
                 } catch (error) {
                     console.error('[Zishu Native] Result processing error:', error);
@@ -4100,6 +4724,189 @@
                     }
                 } catch (e) {
                     console.error('[Zishu Native] SpeakingError error:', e);
+                }
+            };
+
+            window.ZishuNativePermissionGranted = function(permission) {
+                try {
+                    console.log('[Zishu Native] Permission granted:', permission);
+                } catch (e) {
+                    console.error('[Zishu Native] PermissionGranted error:', e);
+                }
+            };
+
+            window.ZishuNativePermissionDenied = function(permission) {
+                try {
+                    console.log('[Zishu Native] Permission denied:', permission);
+                    var msg = 'Permission denied: ' + permission;
+                    addToolMessage(msg);
+                } catch (e) {
+                    console.error('[Zishu Native] PermissionDenied error:', e);
+                }
+            };
+
+            window.ZishuNativeWakeWordDetected = function() {
+                try {
+                    console.log('[Zishu Native] Wake word detected');
+                    if (!isProcessing && !isSpeakingNow) {
+                        setOrbState(STATE.LISTENING);
+                        if (hasNative) {
+                            ZishuNative.startListening();
+                        }
+                    }
+                } catch (e) {
+                    console.error('[Zishu Native] WakeWordDetected error:', e);
+                }
+            };
+
+            window.ZishuNativeWakeWordState = function(enabled) {
+                try {
+                    console.log('[Zishu Native] Wake word state:', enabled);
+                } catch (e) {
+                    console.error('[Zishu Native] WakeWordState error:', e);
+                }
+            };
+
+            window.ZishuNativeActionResult = function(action, result) {
+                try {
+                    console.log('[Zishu Native] Native result:', action, result);
+                    // Handle app-not-installed / unknown-app results
+                    var r = result;
+                    if (typeof r === 'string') {
+                        if (r === 'not_installed') {
+                            addActionMessage('Yeh app aapke phone mein installed nahi hai.');
+                        } else if (r === 'unknown_app') {
+                            addActionMessage('Main is app ko identify nahi kar pai.');
+                        } else if (r === 'permission_denied') {
+                            addActionMessage('Permission denied. Please grant permission.');
+                        } else if (r === 'failed' || r === 'error') {
+                            addActionMessage('Kuch galat ho gaya. Dobara try karein.');
+                        }
+                    }
+                } catch (e) {
+                    console.error('[Zishu Native] ActionResult error:', e);
+                }
+            };
+
+            window.ZishuNativeInstalledAppsResult = function(apps) {
+                try {
+                    console.log('[Zishu Native] Installed apps received:', apps ? apps.length : 0);
+                } catch (e) {
+                    console.error('[Zishu Native] InstalledAppsResult error:', e);
+                }
+            };
+
+            window.ZishuNativeDeviceInfoResult = function(info) {
+                try {
+                    console.log('[Zishu Native] Device info:', info);
+                    var text = '';
+                    if (typeof info === 'string') {
+                        text = info;
+                    } else if (info && typeof info === 'object') {
+                        text = Object.keys(info).map(function(k) { return k + ': ' + info[k]; }).join('\n');
+                    }
+                    if (text) {
+                        var msgDiv = document.createElement('div');
+                        msgDiv.className = 'zishu-message zishu-assistant-msg';
+                        var s = document.createElement('span');
+                        s.className = 'zishu-sender';
+                        s.textContent = 'Zishu';
+                        var c = document.createElement('span');
+                        c.className = 'zishu-content';
+                        c.textContent = text;
+                        msgDiv.appendChild(s);
+                        msgDiv.appendChild(c);
+                        chatContainer.appendChild(msgDiv);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        speakText(text);
+                    }
+                } catch (e) {
+                    console.error('[Zishu Native] DeviceInfoResult error:', e);
+                }
+            };
+
+            window.ZishuNativeBatteryResult = function(info) {
+                try {
+                    console.log('[Zishu Native] Battery info:', info);
+                    var text = '';
+                    if (typeof info === 'string') {
+                        text = info;
+                    } else if (info && typeof info === 'object') {
+                        var level = info.level || info.percent || info.percentage;
+                        var charging = info.charging || info.isCharging;
+                        text = 'Battery: ' + level + '%' + (charging ? ' (charging)' : '');
+                    }
+                    if (text) {
+                        var msgDiv = document.createElement('div');
+                        msgDiv.className = 'zishu-message zishu-assistant-msg';
+                        var s = document.createElement('span');
+                        s.className = 'zishu-sender';
+                        s.textContent = 'Zishu';
+                        var c = document.createElement('span');
+                        c.className = 'zishu-content';
+                        c.textContent = text;
+                        msgDiv.appendChild(s);
+                        msgDiv.appendChild(c);
+                        chatContainer.appendChild(msgDiv);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        speakText(text);
+                    }
+                } catch (e) {
+                    console.error('[Zishu Native] BatteryResult error:', e);
+                }
+            };
+
+            window.ZishuNativeLocationResult = function(location) {
+                try {
+                    console.log('[Zishu Native] Location result:', location);
+                    var text = '';
+                    if (typeof location === 'string') {
+                        text = 'Your location: ' + location;
+                    } else if (location && typeof location === 'object') {
+                        text = 'Lat: ' + location.latitude + ', Lng: ' + location.longitude;
+                    }
+                    if (text) {
+                        var msgDiv = document.createElement('div');
+                        msgDiv.className = 'zishu-message zishu-assistant-msg';
+                        var s = document.createElement('span');
+                        s.className = 'zishu-sender';
+                        s.textContent = 'Zishu';
+                        var c = document.createElement('span');
+                        c.className = 'zishu-content';
+                        c.textContent = text;
+                        msgDiv.appendChild(s);
+                        msgDiv.appendChild(c);
+                        chatContainer.appendChild(msgDiv);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        speakText(text);
+                    }
+                } catch (e) {
+                    console.error('[Zishu Native] LocationResult error:', e);
+                }
+            };
+
+            window.ZishuNativeNotificationResult = function(result) {
+                try {
+                    console.log('[Zishu Native] Notification result:', result);
+                } catch (e) {
+                    console.error('[Zishu Native] NotificationResult error:', e);
+                }
+            };
+
+            window.ZishuNativeError = function(action, error) {
+                try {
+                    console.error('[Zishu Native] Native error:', action, error);
+                    addToolMessage('Error: ' + action + ' - ' + error);
+                } catch (e) {
+                    console.error('[Zishu Native] Error callback error:', e);
+                }
+            };
+
+            window.ZishuNativeAssistantStateChanged = function(s) {
+                try {
+                    console.log('[Zishu Native] Assistant state:', s);
+                } catch (e) {
+                    console.error('[Zishu Native] AssistantStateChanged error:', e);
                 }
             };
 
@@ -4161,3 +4968,4 @@
 
 </body>
 </html>
+                     
