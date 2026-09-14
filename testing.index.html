@@ -4166,23 +4166,23 @@
     }
 
                 } else if (action.type === 'send_sms_contact') {
-                    if (hasNative) {
-                        var r3 = ZishuNative.sendSmsToContact(action.data.contactName, action.data.message);
-                        if (r3 === null) {
-                            var msg5 = 'SMS feature available nahi hai.';
-                            addActionMessage(msg5);
-                            speakText(msg5);
-                        } else {
-                            var okMsg3 = action.data.contactName + ' ko SMS bhej rahi hoon.';
-                            addActionMessage(okMsg3);
-                            speakText(okMsg3);
-                        }
-                    } else {
-                        var msg6 = 'Native SMS support is not available in this browser.';
-                        addActionMessage(msg6);
-                        speakText(msg6);
-                    }
-                }
+    if (hasNative) {
+        var r3 = ZishuNative.sendSmsToContact(action.data.contactName, action.data.message);
+        if (r3 === null) {
+            var msg5 = 'SMS feature available nahi hai.';
+            addActionMessage(msg5);
+            speakText(msg5);
+        } else {
+            var okMsg3 = action.data.contactName + ' ko SMS bhej rahi hoon.';
+            addActionMessage(okMsg3);
+            speakText(okMsg3);
+        }
+    } else {
+        var msg6 = 'Native SMS support is not available in this browser.';
+        addActionMessage(msg6);
+        speakText(msg6);
+    }
+}
 
                 isProcessing = false;
                 if (!isStopped) {
