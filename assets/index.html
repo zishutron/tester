@@ -1,0 +1,3915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
+<meta name="theme-color" content="#F4F6FB" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#080B12" media="(prefers-color-scheme: dark)" />
+<title>Zishu — AI Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   ZISHU — PREMIUM NATIVE ANDROID DESIGN SYSTEM
+   ============================================================ */
+*,*::before,*::after {
+  margin:0; padding:0; box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+:root {
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px;
+  --r-xs:10px; --r-sm:14px; --r:18px; --r-md:20px; --r-lg:24px; --r-xl:28px; --r-pill:999px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --fs-display:2rem; --fs-title:1.375rem; --fs-section:.72rem;
+  --fs-body:.9rem; --fs-small:.8rem; --fs-caption:.7rem;
+
+  --bg:#F4F6FB; --bg-elev:#FFFFFF; --surface:#FFFFFF; --surface-2:#F8FAFE;
+  --surface-3:#EEF2F9; --surface-press:#E8EEF8; --overlay:rgba(15,23,42,.04);
+
+  --text:#0B1220; --text-2:#4A5568; --text-3:#8894A7; --text-inverse:#FFFFFF;
+
+  --line:#E7ECF4; --line-2:#EFF3FA; --line-strong:#DCE4F0;
+
+  --brand:#3B72F0; --brand-2:#5B5BF5;
+  --brand-soft:rgba(59,114,240,.09); --brand-soft-2:rgba(59,114,240,.14);
+  --brand-glow:rgba(59,114,240,.22);
+
+  --success:#0EA06B; --success-soft:rgba(14,160,107,.11);
+  --warning:#D97706; --warning-soft:rgba(217,119,6,.11);
+  --danger:#DC3A3A; --danger-soft:rgba(220,58,58,.10);
+
+  --e-1:0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03);
+  --e-2:0 2px 6px rgba(15,23,42,.05), 0 1px 2px rgba(15,23,42,.04);
+  --e-3:0 6px 20px rgba(15,23,42,.07), 0 2px 4px rgba(15,23,42,.04);
+  --e-4:0 16px 44px rgba(15,23,42,.10), 0 4px 12px rgba(15,23,42,.05);
+
+  --orb-base-1:#FFFFFF; --orb-base-2:#DDE5F0; --orb-base-3:#B8C4D6; --orb-base-4:#9AA7BE;
+  --orb-visor:#0A0E1A; --orb-eye:#7EE6FF; --orb-eye-2:#3B72F0;
+
+  --appbar-h:56px; --nav-h:64px;
+
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-spring:cubic-bezier(.34,1.4,.4,1);
+  --ease-in-out:cubic-bezier(.4,0,.2,1);
+  --dur-1:120ms; --dur-2:180ms; --dur-3:260ms; --dur-4:420ms;
+}
+
+[data-theme="dark"] {
+  --bg:#080B12; --bg-elev:#0E131E; --surface:#0E131E; --surface-2:#131A28;
+  --surface-3:#1A2334; --surface-press:#212B40; --overlay:rgba(255,255,255,.04);
+
+  --text:#EEF2FA; --text-2:#9AA6BC; --text-3:#68748C; --text-inverse:#0B1220;
+
+  --line:#1E2739; --line-2:#161E2E; --line-strong:#2A3750;
+
+  --brand:#5B8EFF; --brand-2:#7E7EFF;
+  --brand-soft:rgba(91,142,255,.12); --brand-soft-2:rgba(91,142,255,.18);
+  --brand-glow:rgba(91,142,255,.32);
+
+  --success:#2AD493; --success-soft:rgba(42,212,147,.13);
+  --warning:#F0A63D; --warning-soft:rgba(240,166,61,.13);
+  --danger:#FF5C5C; --danger-soft:rgba(255,92,92,.13);
+
+  --e-1:0 1px 2px rgba(0,0,0,.4);
+  --e-2:0 2px 8px rgba(0,0,0,.45);
+  --e-3:0 8px 26px rgba(0,0,0,.5);
+  --e-4:0 20px 52px rgba(0,0,0,.6);
+
+  --orb-base-1:#2A324A; --orb-base-2:#1B2236; --orb-base-3:#141A2A; --orb-base-4:#0C111E;
+  --orb-visor:#050810;
+}
+
+html,body { height:100%; background:var(--bg); }
+
+body {
+  font-family:var(--font);
+  font-feature-settings:'cv02','cv03','cv04','cv11','ss01';
+  background:var(--bg); color:var(--text);
+  line-height:1.5; font-size:var(--fs-body);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  overscroll-behavior-y:none;
+  transition:background var(--dur-3) var(--ease-in-out), color var(--dur-3) var(--ease-in-out);
+  touch-action:manipulation;
+}
+
+::selection { background:var(--brand-soft-2); }
+
+.app-shell {
+  display:flex; flex-direction:column;
+  min-height:100dvh; max-width:600px; margin:0 auto;
+  background:var(--bg); position:relative;
+  transition:background var(--dur-3) var(--ease-in-out);
+}
+
+.app-bar {
+  position:sticky; top:0; z-index:60;
+  min-height:var(--appbar-h); padding-top:env(safe-area-inset-top);
+  display:flex; align-items:center; justify-content:space-between;
+  padding-left:max(var(--s-4),env(safe-area-inset-left));
+  padding-right:max(var(--s-3),env(safe-area-inset-right));
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid transparent;
+  transition:border-color var(--dur-2), background var(--dur-3);
+}
+.app-bar.scrolled {
+  border-bottom-color:var(--line-2);
+  background:color-mix(in srgb, var(--bg) 92%, transparent);
+}
+.app-bar-left { display:flex; align-items:center; gap:var(--s-3); min-width:0; flex:1; }
+.app-bar-brand {
+  display:flex; align-items:center; gap:var(--s-2);
+  font-weight:700; font-size:.98rem; letter-spacing:-.02em;
+  color:var(--text); text-decoration:none; cursor:pointer;
+  transition:opacity var(--dur-1);
+}
+.app-bar-brand:active { opacity:.6; }
+.logo-mark {
+  width:30px; height:30px; border-radius:9px;
+  background:linear-gradient(140deg,var(--brand),var(--brand-2));
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:.88rem; font-weight:800;
+  box-shadow:0 4px 12px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,.2);
+  flex-shrink:0; letter-spacing:-.04em; position:relative;
+}
+.logo-mark::after {
+  content:''; position:absolute; inset:0; border-radius:9px;
+  background:linear-gradient(140deg, rgba(255,255,255,.15), transparent 60%);
+  pointer-events:none;
+}
+.brand-text span.accent { color:var(--brand); }
+
+.assistant-status {
+  display:flex; align-items:center; gap:6px;
+  padding:5px 10px 5px 8px; border-radius:var(--r-pill);
+  background:var(--surface-3);
+  font-size:.7rem; font-weight:600; letter-spacing:-.01em;
+  color:var(--text-2);
+  transition:all var(--dur-2) var(--ease-out);
+  flex-shrink:0; border:1px solid transparent;
+}
+.assistant-status .status-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--success);
+  box-shadow:0 0 0 3px var(--success-soft);
+  transition:all var(--dur-2);
+}
+.assistant-status[data-state="listening"] .status-dot {
+  background:var(--brand); box-shadow:0 0 0 3px var(--brand-soft-2);
+  animation:pulseDot 1.4s ease-in-out infinite;
+}
+.assistant-status[data-state="thinking"] .status-dot {
+  background:var(--brand-2); box-shadow:0 0 0 3px rgba(91,91,245,.18);
+  animation:pulseDot 1s ease-in-out infinite;
+}
+.assistant-status[data-state="speaking"] .status-dot {
+  background:var(--success); box-shadow:0 0 0 3px var(--success-soft);
+  animation:pulseDot 1s ease-in-out infinite;
+}
+@keyframes pulseDot {
+  0%,100% { transform:scale(1); opacity:1; }
+  50% { transform:scale(1.35); opacity:.75; }
+}
+.app-bar-actions { display:flex; align-items:center; gap:2px; flex-shrink:0; }
+.icon-btn {
+  width:40px; height:40px; border-radius:12px; border:none;
+  background:transparent; color:var(--text-2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background var(--dur-1), color var(--dur-1), transform var(--dur-1);
+  flex-shrink:0;
+}
+.icon-btn svg { width:20px; height:20px; stroke-width:1.9; }
+.icon-btn:hover { background:var(--surface-3); color:var(--text); }
+.icon-btn:active { transform:scale(.92); background:var(--surface-press); }
+
+.screen-viewport {
+  flex:1; position:relative; display:flex; flex-direction:column;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));
+}
+.screen {
+  display:none; flex-direction:column; flex:1;
+  padding-left:max(var(--s-4),env(safe-area-inset-left));
+  padding-right:max(var(--s-4),env(safe-area-inset-right));
+  animation:screenEnter var(--dur-3) var(--ease-out);
+}
+.screen.active { display:flex; }
+@keyframes screenEnter {
+  from { opacity:0; transform:translateY(8px) scale(.995); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+#screen-home { padding-left:0; padding-right:0; padding-bottom:0; }
+
+.home-wrap {
+  flex:1; display:flex; flex-direction:column;
+  padding:var(--s-2) 0 0;
+  min-height:calc(100dvh - var(--appbar-h) - var(--nav-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+.home-top { text-align:center; padding:var(--s-3) var(--s-5) 0; }
+.home-greeting {
+  font-size:.68rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.16em; color:var(--text-3);
+}
+.home-title {
+  font-size:1.55rem; font-weight:700; letter-spacing:-.035em;
+  color:var(--text); margin-top:var(--s-1); line-height:1.15;
+}
+.home-title .accent { color:var(--brand); }
+.home-subtitle {
+  font-size:.82rem; color:var(--text-2);
+  margin-top:4px; font-weight:450;
+}
+
+.orb-stage {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:var(--s-2) var(--s-4) var(--s-3);
+  min-height:300px; position:relative;
+}
+#zishu-orb-container {
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  position:relative; perspective:1000px;
+}
+.orb-halo {
+  position:absolute; width:280px; height:280px;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle, var(--brand-glow) 0%, transparent 62%);
+  filter:blur(28px); opacity:.7; pointer-events:none;
+  animation:haloBreathe 4.5s ease-in-out infinite;
+  transition:opacity var(--dur-4), transform var(--dur-4);
+  z-index:0;
+}
+@keyframes haloBreathe {
+  0%,100% { opacity:.55; transform:translate(-50%,-50%) scale(1); }
+  50% { opacity:.85; transform:translate(-50%,-50%) scale(1.08); }
+}
+#zishu-orb-wrapper {
+  width:168px; height:168px; position:relative;
+  transform-style:preserve-3d; cursor:pointer; z-index:10;
+  transition:transform var(--dur-3) var(--ease-spring);
+  animation:orbFloat 5s ease-in-out infinite;
+}
+#zishu-orb-wrapper:active { transform:scale(.94); }
+@keyframes orbFloat {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-9px); }
+}
+.orb-ring-layer { position:absolute; inset:0; pointer-events:none; z-index:4; }
+.orb-ring {
+  position:absolute; top:50%; left:50%;
+  border-radius:50%; border:1.5px solid transparent;
+  transform:translate(-50%,-50%);
+}
+.orb-ring.r1 {
+  width:200px; height:200px;
+  border-top-color:color-mix(in srgb, var(--brand) 55%, transparent);
+  border-right-color:color-mix(in srgb, var(--brand-2) 35%, transparent);
+  animation:ringSpin 16s linear infinite; filter:blur(.4px);
+}
+.orb-ring.r2 {
+  width:182px; height:182px;
+  border-bottom-color:color-mix(in srgb, var(--brand) 45%, transparent);
+  border-left-color:color-mix(in srgb, var(--brand-2) 30%, transparent);
+  animation:ringSpin 11s linear infinite reverse; filter:blur(.4px); opacity:.8;
+}
+.orb-ring.r3 {
+  width:222px; height:222px;
+  border-top-color:color-mix(in srgb, var(--brand) 22%, transparent);
+  border-left-color:color-mix(in srgb, var(--brand-2) 18%, transparent);
+  animation:ringSpin 22s linear infinite; opacity:.55;
+}
+@keyframes ringSpin {
+  from { transform:translate(-50%,-50%) rotate(0deg); }
+  to { transform:translate(-50%,-50%) rotate(360deg); }
+}
+#zishu-orb {
+  position:relative; width:168px; height:168px; border-radius:50%;
+  background:radial-gradient(ellipse at 32% 26%,
+    var(--orb-base-1) 0%, var(--orb-base-2) 42%,
+    var(--orb-base-3) 74%, var(--orb-base-4) 100%);
+  box-shadow:
+    inset -22px -26px 46px rgba(0,0,0,.16),
+    inset 18px 18px 34px rgba(255,255,255,.55),
+    inset 0 0 0 1px rgba(255,255,255,.28),
+    0 22px 60px var(--brand-glow),
+    0 4px 16px rgba(15,23,42,.10);
+  transform:rotateX(-4deg) rotateY(-4deg);
+  transition:transform var(--dur-4) var(--ease-out),
+             box-shadow var(--dur-4) var(--ease-out),
+             background var(--dur-4) var(--ease-out);
+  z-index:1; cursor:pointer; overflow:hidden;
+}
+#zishu-orb::before {
+  content:''; position:absolute; inset:0; border-radius:50%;
+  background:
+    radial-gradient(ellipse at 38% 30%, rgba(255,255,255,.9) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 78%, rgba(150,170,200,.28) 0%, transparent 48%);
+  pointer-events:none; mix-blend-mode:screen;
+}
+#zishu-orb::after {
+  content:''; position:absolute; inset:-40%; border-radius:50%;
+  background:conic-gradient(from 0deg,
+    transparent 0deg,
+    color-mix(in srgb, var(--brand) 20%, transparent) 90deg,
+    transparent 180deg,
+    color-mix(in srgb, var(--brand-2) 16%, transparent) 270deg,
+    transparent 360deg);
+  opacity:.5; animation:orbSheen 8s linear infinite;
+  pointer-events:none; mix-blend-mode:overlay;
+}
+@keyframes orbSheen {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
+}
+#zishu-orb-visor {
+  position:absolute; width:100px; height:68px;
+  top:50%; left:50%; transform:translate(-50%,-50%) rotateX(4deg);
+  border-radius:50%;
+  background:radial-gradient(ellipse at 42% 36%, #1A2036 0%, var(--orb-visor) 55%, #000 100%);
+  box-shadow:
+    inset 0 -6px 14px rgba(0,0,0,.7),
+    inset 0 6px 14px rgba(90,120,180,.12),
+    0 0 40px rgba(59,114,240,.10),
+    0 0 0 1px rgba(255,255,255,.03);
+  z-index:2; overflow:hidden; transition:box-shadow var(--dur-3);
+}
+#zishu-orb-visor::before {
+  content:''; position:absolute; top:9px; left:14px;
+  width:26px; height:12px; border-radius:50%;
+  background:radial-gradient(ellipse, rgba(140,180,255,.22) 0%, transparent 70%);
+  transform:rotate(-22deg); filter:blur(1px);
+}
+#zishu-orb-visor::after {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 60% 80%, rgba(59,114,240,.14) 0%, transparent 60%);
+  opacity:.6;
+}
+#zishu-orb-eyes {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  display:flex; gap:24px; z-index:3;
+}
+.zishu-eye {
+  width:13px; height:17px; border-radius:50%;
+  background:radial-gradient(ellipse at 50% 38%, var(--orb-eye) 0%, var(--orb-eye-2) 55%, #1A4A8A 100%);
+  box-shadow:
+    0 0 18px var(--brand-glow),
+    0 0 36px color-mix(in srgb, var(--brand) 40%, transparent),
+    inset 0 2px 4px rgba(255,255,255,.35);
+  position:relative; transition:all var(--dur-3) var(--ease-out);
+  animation:eyePulse 3.6s ease-in-out infinite;
+}
+.zishu-eye.left { animation-delay:.3s; }
+.zishu-eye.right { animation-delay:.9s; }
+.zishu-eye::after {
+  content:''; position:absolute; top:3px; left:3.5px;
+  width:4.5px; height:4.5px; border-radius:50%;
+  background:rgba(255,255,255,.75); filter:blur(.6px);
+}
+@keyframes eyePulse {
+  0%,100% { opacity:.92; }
+  50% { opacity:1; }
+}
+
+#zishu-orb-wrapper.listening .orb-halo {
+  opacity:1; transform:translate(-50%,-50%) scale(1.15);
+}
+#zishu-orb-wrapper.listening #zishu-orb {
+  box-shadow:
+    inset -22px -26px 46px rgba(0,0,0,.16),
+    inset 18px 18px 34px rgba(255,255,255,.55),
+    inset 0 0 0 1px rgba(255,255,255,.32),
+    0 22px 70px var(--brand-glow),
+    0 0 90px color-mix(in srgb, var(--brand) 22%, transparent);
+  animation:orbListen 1.6s ease-in-out infinite;
+}
+#zishu-orb-wrapper.listening .zishu-eye { animation:eyeListen 1s ease-in-out infinite; }
+@keyframes orbListen {
+  0%,100% { transform:scale(1) rotateX(-4deg) rotateY(-4deg); }
+  50% { transform:scale(1.03) rotateX(-4deg) rotateY(-4deg); }
+}
+@keyframes eyeListen {
+  0%,100% { transform:scaleY(1); }
+  50% { transform:scaleY(1.15); }
+}
+#zishu-orb-wrapper.thinking .orb-halo {
+  opacity:1; transform:translate(-50%,-50%) scale(1.08);
+  filter:blur(32px) hue-rotate(18deg);
+}
+#zishu-orb-wrapper.thinking #zishu-orb {
+  box-shadow:
+    inset -22px -26px 46px rgba(0,0,0,.16),
+    inset 18px 18px 34px rgba(255,255,255,.55),
+    inset 0 0 0 1px rgba(255,255,255,.32),
+    0 22px 70px color-mix(in srgb, var(--brand-2) 40%, transparent),
+    0 0 90px color-mix(in srgb, var(--brand-2) 20%, transparent);
+  animation:orbThink 2.4s linear infinite;
+}
+#zishu-orb-wrapper.thinking .orb-ring.r1 { border-top-color:var(--brand-2); animation-duration:2.4s; }
+#zishu-orb-wrapper.thinking .orb-ring.r2 { border-bottom-color:var(--brand); animation-duration:1.8s; }
+#zishu-orb-wrapper.thinking .zishu-eye { animation:eyeThink 1.4s ease-in-out infinite; }
+@keyframes orbThink {
+  from { transform:rotateX(-4deg) rotateY(-4deg) rotate(0deg); }
+  to { transform:rotateX(-4deg) rotateY(-4deg) rotate(360deg); }
+}
+@keyframes eyeThink {
+  0%,100% { border-radius:50%; }
+  50% { border-radius:32%; }
+}
+#zishu-orb-wrapper.speaking .orb-halo {
+  opacity:1; transform:translate(-50%,-50%) scale(1.12);
+  animation-duration:1.4s;
+}
+#zishu-orb-wrapper.speaking #zishu-orb {
+  box-shadow:
+    inset -22px -26px 46px rgba(0,0,0,.16),
+    inset 18px 18px 34px rgba(255,255,255,.55),
+    inset 0 0 0 1px rgba(255,255,255,.32),
+    0 22px 70px var(--brand-glow),
+    0 0 100px color-mix(in srgb, var(--brand) 26%, transparent);
+  animation:orbSpeak .7s ease-in-out infinite alternate;
+}
+#zishu-orb-wrapper.speaking .zishu-eye { animation:eyeSpeak .5s ease-in-out infinite alternate; }
+@keyframes orbSpeak {
+  from { transform:scale(1) translateY(0) rotateX(-4deg) rotateY(-4deg); }
+  to { transform:scale(1.025) translateY(-3px) rotateX(-4deg) rotateY(-4deg); }
+}
+@keyframes eyeSpeak {
+  0% { transform:scaleY(1); }
+  100% { transform:scaleY(1.2); }
+}
+#zishu-orb-status {
+  margin-top:var(--s-5); font-size:1.05rem; font-weight:650;
+  letter-spacing:-.02em; color:var(--text); text-align:center;
+  transition:color var(--dur-3); z-index:5; position:relative;
+}
+#zishu-orb-sub {
+  font-size:.78rem; color:var(--text-2); margin-top:3px;
+  font-weight:450; text-align:center;
+  transition:color var(--dur-3); z-index:5; position:relative;
+  letter-spacing:-.005em;
+}
+
+.conversation-area {
+  flex:0 1 auto;
+  max-height:180px; min-height:0;
+  overflow-y:auto; overflow-x:hidden;
+  padding:var(--s-2) var(--s-4) var(--s-3);
+  display:flex; flex-direction:column; gap:6px;
+  scroll-behavior:smooth; -webkit-overflow-scrolling:touch;
+  mask-image:linear-gradient(to bottom, transparent 0%, #000 12%, #000 100%);
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 12%, #000 100%);
+  transition:max-height var(--dur-3) var(--ease-out);
+}
+.conversation-area:empty { display:none; }
+.conversation-area::-webkit-scrollbar { width:0; height:0; }
+.conversation-area { scrollbar-width:none; }
+
+.zishu-message {
+  max-width:86%; padding:9px 13px; border-radius:16px;
+  font-size:.82rem; line-height:1.5;
+  word-wrap:break-word; word-break:break-word;
+  animation:msgIn var(--dur-3) var(--ease-out);
+  letter-spacing:-.005em; position:relative; flex-shrink:0;
+}
+@keyframes msgIn {
+  from { opacity:0; transform:translateY(6px) scale(.98); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+.zishu-user-msg {
+  background:var(--brand); color:#fff;
+  align-self:flex-end; border-bottom-right-radius:5px;
+  box-shadow:0 2px 8px var(--brand-soft-2);
+}
+.zishu-assistant-msg {
+  background:var(--surface-3); color:var(--text);
+  align-self:flex-start; border-bottom-left-radius:5px;
+}
+.zishu-message .zishu-sender {
+  font-size:.62rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.08em; opacity:.7; display:block; margin-bottom:2px;
+}
+.zishu-user-msg .zishu-sender { color:rgba(255,255,255,.85); }
+.zishu-assistant-msg .zishu-sender { color:var(--text-3); }
+.zishu-message .zishu-content {
+  display:block; white-space:pre-wrap; word-break:break-word;
+}
+.zishu-tool-msg {
+  background:var(--surface-3); color:var(--text-2);
+  font-size:.7rem; padding:5px 12px; border-radius:var(--r-pill);
+  align-self:center; max-width:90%; text-align:center;
+  font-weight:500; letter-spacing:-.005em; flex-shrink:0;
+  animation:msgIn var(--dur-3) var(--ease-out);
+}
+.zishu-stop-msg {
+  background:var(--danger-soft); color:var(--danger);
+  font-size:.7rem; padding:5px 12px; border-radius:var(--r-pill);
+  align-self:center; font-weight:600; flex-shrink:0;
+}
+.zishu-action-msg {
+  background:var(--success-soft); color:var(--success);
+  font-size:.7rem; padding:5px 12px; border-radius:var(--r-pill);
+  align-self:center; font-weight:600; flex-shrink:0;
+}
+
+.voice-notice {
+  display:flex; align-items:flex-start; gap:var(--s-3);
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r); padding:11px 14px;
+  margin:0 var(--s-4) var(--s-4); font-size:.76rem;
+  color:var(--text-2); line-height:1.5; box-shadow:var(--e-1);
+  animation:noticeIn var(--dur-4) var(--ease-out);
+  max-width:520px; margin-left:auto; margin-right:auto;
+  width:calc(100% - var(--s-8));
+  margin-top:auto;
+}
+@keyframes noticeIn {
+  from { opacity:0; transform:translateY(6px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.voice-notice .notice-icon {
+  flex-shrink:0; width:30px; height:30px; border-radius:9px;
+  background:var(--brand-soft); color:var(--brand);
+  display:flex; align-items:center; justify-content:center;
+  margin-top:-1px;
+}
+.voice-notice .notice-icon svg { width:16px; height:16px; stroke-width:2; }
+.voice-notice .notice-body { flex:1; min-width:0; }
+.voice-notice .notice-body strong {
+  font-weight:650; color:var(--text); display:block; margin-bottom:1px;
+  font-size:.78rem;
+}
+
+.screen-header { padding:var(--s-5) var(--s-1) var(--s-3); }
+.screen-header h1 {
+  font-size:var(--fs-title); font-weight:700; letter-spacing:-.03em;
+  color:var(--text); line-height:1.2;
+}
+.screen-header p {
+  font-size:.84rem; color:var(--text-2);
+  margin-top:3px; line-height:1.5; max-width:440px;
+}
+
+.section-label {
+  font-size:var(--fs-section); font-weight:700; text-transform:uppercase;
+  letter-spacing:.14em; color:var(--text-3);
+  padding:var(--s-5) var(--s-1) var(--s-2);
+}
+
+.card {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r); padding:var(--s-4);
+  box-shadow:var(--e-1); margin-bottom:var(--s-2);
+  transition:border-color var(--dur-2);
+}
+.card h3 { font-size:.94rem; font-weight:650; color:var(--text); letter-spacing:-.015em; }
+.card p { font-size:.82rem; color:var(--text-2); line-height:1.6; margin-top:5px; }
+
+.feature-list {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r); overflow:hidden; box-shadow:var(--e-1);
+}
+.feature-row {
+  display:flex; align-items:center; gap:var(--s-3);
+  padding:var(--s-3) var(--s-4); border-bottom:1px solid var(--line-2);
+  transition:background var(--dur-1); cursor:pointer; min-height:60px;
+}
+.feature-row:last-child { border-bottom:none; }
+.feature-row:active { background:var(--surface-press); }
+.feature-row .fr-icon {
+  width:38px; height:38px; border-radius:11px;
+  background:var(--brand-soft); color:var(--brand);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:background var(--dur-2);
+}
+.feature-row .fr-icon svg { width:19px; height:19px; stroke-width:1.9; }
+.feature-row .fr-body { flex:1; min-width:0; }
+.feature-row .fr-title {
+  font-size:.88rem; font-weight:600; color:var(--text); letter-spacing:-.01em;
+}
+.feature-row .fr-sub {
+  font-size:.75rem; color:var(--text-2); margin-top:1px; line-height:1.4;
+}
+
+.steps-card {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r); overflow:hidden; box-shadow:var(--e-1);
+  padding:var(--s-2) var(--s-3);
+}
+.step-row {
+  display:flex; gap:var(--s-3); padding:var(--s-3) var(--s-2);
+  align-items:flex-start; border-bottom:1px solid var(--line-2);
+}
+.step-row:last-child { border-bottom:none; }
+.step-num {
+  width:32px; height:32px; border-radius:50%;
+  background:var(--brand-soft); color:var(--brand);
+  font-weight:700; font-size:.82rem;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; box-shadow:0 0 0 1px color-mix(in srgb, var(--brand) 8%, transparent);
+}
+.step-body h4 { font-size:.87rem; font-weight:650; color:var(--text); letter-spacing:-.01em; }
+.step-body p { font-size:.78rem; color:var(--text-2); line-height:1.5; margin-top:2px; }
+
+.chip-wrap { display:flex; flex-wrap:wrap; gap:var(--s-2); padding:var(--s-1) 0; }
+.chip {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-pill); padding:9px 15px;
+  font-size:.78rem; font-weight:500; color:var(--text);
+  white-space:nowrap; cursor:pointer;
+  transition:transform var(--dur-1), background var(--dur-1), border-color var(--dur-1);
+  box-shadow:var(--e-1); font-family:inherit; letter-spacing:-.005em;
+}
+.chip:active {
+  transform:scale(.96); background:var(--brand-soft);
+  border-color:color-mix(in srgb, var(--brand) 25%, var(--line));
+}
+
+.faq-list {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r); overflow:hidden; box-shadow:var(--e-1);
+}
+.faq-item { border-bottom:1px solid var(--line-2); cursor:pointer; }
+.faq-item:last-child { border-bottom:none; }
+.faq-question {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:var(--s-3); padding:var(--s-4) var(--s-4);
+  font-size:.85rem; font-weight:600; color:var(--text);
+  transition:background var(--dur-1); min-height:52px; letter-spacing:-.01em;
+}
+.faq-item:active .faq-question { background:var(--surface-press); }
+.faq-chevron {
+  width:18px; height:18px; flex-shrink:0; color:var(--text-3);
+  transition:transform var(--dur-3) var(--ease-out);
+}
+.faq-item.open .faq-chevron { transform:rotate(180deg); color:var(--brand); }
+.faq-answer {
+  max-height:0; overflow:hidden;
+  transition:max-height var(--dur-3) var(--ease-out), padding var(--dur-3) var(--ease-out);
+  font-size:.8rem; color:var(--text-2); line-height:1.6; padding:0 var(--s-4);
+}
+.faq-item.open .faq-answer { max-height:400px; padding:0 var(--s-4) var(--s-4); }
+
+.about-hero-card {
+  text-align:center; padding:var(--s-6) var(--s-5) var(--s-5);
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-lg); box-shadow:var(--e-2);
+  margin-bottom:var(--s-3); position:relative; overflow:hidden;
+}
+.about-hero-card::before {
+  content:''; position:absolute;
+  top:-60px; left:50%; transform:translateX(-50%);
+  width:220px; height:220px; border-radius:50%;
+  background:radial-gradient(circle, var(--brand-glow) 0%, transparent 62%);
+  filter:blur(24px); opacity:.7; pointer-events:none;
+}
+.about-app-icon {
+  position:relative; width:72px; height:72px; border-radius:22px;
+  background:linear-gradient(140deg, var(--brand), var(--brand-2));
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:1.9rem; font-weight:800;
+  margin:0 auto var(--s-3);
+  box-shadow:0 12px 32px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,.25);
+  letter-spacing:-.05em;
+}
+.about-hero-card h2 {
+  font-size:1.22rem; font-weight:700; letter-spacing:-.03em;
+  color:var(--text); position:relative;
+}
+.about-hero-card p {
+  font-size:.82rem; color:var(--text-2); margin-top:var(--s-1);
+  line-height:1.6; position:relative; max-width:340px;
+  margin-left:auto; margin-right:auto;
+}
+.founder-row { display:flex; align-items:center; gap:var(--s-3); }
+.founder-avatar {
+  width:56px; height:56px; border-radius:50%;
+  background:var(--brand-soft); border:2px solid var(--brand);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.25rem; font-weight:750; color:var(--brand);
+  flex-shrink:0; box-shadow:0 0 0 4px var(--brand-soft);
+}
+.founder-meta h3 { font-size:.95rem; font-weight:700; color:var(--text); letter-spacing:-.01em; }
+.founder-meta .role { font-size:.76rem; color:var(--text-2); font-weight:500; margin-top:1px; }
+.founder-meta .status { font-size:.72rem; color:var(--text-3); margin-top:1px; }
+.capability-list { display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:var(--s-3); }
+.capability-list li {
+  list-style:none; font-size:.78rem; color:var(--text-2);
+  display:flex; align-items:center; gap:6px;
+  padding:4px 10px; background:var(--surface-2);
+  border-radius:var(--r-pill); border:1px solid var(--line-2);
+}
+.capability-list li::before {
+  content:''; width:5px; height:5px; border-radius:50%;
+  background:var(--brand); flex-shrink:0;
+}
+.founder-quote {
+  background:var(--surface-2); border-left:3px solid var(--brand);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  padding:var(--s-4); margin-top:var(--s-2);
+  font-style:italic; font-size:.82rem;
+  color:var(--text-2); line-height:1.7;
+}
+.founder-quote .signature {
+  font-style:normal; font-weight:650; color:var(--text);
+  margin-top:var(--s-3); font-size:.78rem; letter-spacing:-.01em;
+}
+
+.settings-group {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r); overflow:hidden;
+  box-shadow:var(--e-1); margin-bottom:var(--s-3);
+}
+.settings-row {
+  display:flex; align-items:center; gap:var(--s-3);
+  padding:13px var(--s-4); border-bottom:1px solid var(--line-2);
+  cursor:pointer; transition:background var(--dur-1); min-height:58px;
+}
+.settings-row:last-child { border-bottom:none; }
+.settings-row:active { background:var(--surface-press); }
+.settings-row[data-static="true"] { cursor:default; }
+.settings-row[data-static="true"]:active { background:transparent; }
+.sr-icon {
+  width:36px; height:36px; border-radius:11px;
+  background:var(--brand-soft); color:var(--brand);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:background var(--dur-2);
+}
+.sr-icon svg { width:18px; height:18px; stroke-width:1.9; }
+.sr-body { flex:1; min-width:0; }
+.sr-title { font-size:.86rem; font-weight:600; color:var(--text); letter-spacing:-.01em; line-height:1.3; }
+.sr-sub { font-size:.73rem; color:var(--text-2); margin-top:2px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sr-chevron { width:16px; height:16px; color:var(--text-3); flex-shrink:0; }
+
+.theme-segment {
+  display:flex; background:var(--surface-3); border-radius:11px;
+  padding:3px; gap:2px; margin-top:var(--s-2);
+}
+.theme-segment button {
+  flex:1; padding:7px 10px; border:none; background:transparent;
+  border-radius:8px; font-size:.76rem; font-weight:600;
+  color:var(--text-2); cursor:pointer;
+  transition:all var(--dur-2) var(--ease-out);
+  font-family:inherit; letter-spacing:-.005em;
+}
+.theme-segment button.active {
+  background:var(--surface); color:var(--text); box-shadow:var(--e-1);
+}
+
+.lang-option {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px var(--s-4); border-bottom:1px solid var(--line-2);
+  cursor:pointer; transition:background var(--dur-1); min-height:56px;
+}
+.lang-option:last-child { border-bottom:none; }
+.lang-option:active { background:var(--surface-press); }
+.lo-label {
+  display:flex; align-items:center; gap:var(--s-3);
+  font-size:.86rem; font-weight:550; color:var(--text);
+}
+.lo-flag { font-size:1.15rem; }
+.lo-check {
+  width:22px; height:22px; border-radius:50%;
+  border:2px solid var(--line-strong);
+  display:flex; align-items:center; justify-content:center;
+  color:transparent; transition:all var(--dur-2) var(--ease-spring);
+  flex-shrink:0;
+}
+.lang-option.active .lo-check {
+  border-color:var(--brand); background:var(--brand);
+  color:#fff; transform:scale(1.05);
+}
+.lo-check svg { width:12px; height:12px; stroke-width:3; }
+
+/* ============================================================
+   PERMISSION ROWS — TOGGLE SWITCH
+   ============================================================ */
+.perm-row {
+  display:flex; align-items:center; gap:var(--s-3);
+  padding:13px var(--s-4); border-bottom:1px solid var(--line-2);
+  min-height:62px;
+}
+.perm-row:last-child { border-bottom:none; }
+.perm-row .pr-icon {
+  width:36px; height:36px; border-radius:11px;
+  background:var(--brand-soft); color:var(--brand);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:background var(--dur-2);
+}
+.perm-row .pr-icon svg { width:18px; height:18px; stroke-width:1.9; }
+.perm-row .pr-body { flex:1; min-width:0; }
+.perm-row .pr-title { font-size:.86rem; font-weight:600; color:var(--text); letter-spacing:-.01em; }
+.perm-row .pr-sub { font-size:.72rem; color:var(--text-2); margin-top:2px; line-height:1.4; }
+
+/* Toggle switch */
+.perm-toggle {
+  position:relative;
+  width:44px; height:26px;
+  flex-shrink:0;
+  border-radius:var(--r-pill);
+  background:var(--surface-3);
+  border:1px solid var(--line);
+  cursor:pointer;
+  transition:background var(--dur-2) var(--ease-out), border-color var(--dur-2);
+  padding:0;
+  font-family:inherit;
+}
+.perm-toggle::after {
+  content:'';
+  position:absolute;
+  top:2px; left:2px;
+  width:20px; height:20px;
+  border-radius:50%;
+  background:var(--surface);
+  box-shadow:0 1px 3px rgba(15,23,42,.18), 0 1px 1px rgba(15,23,42,.10);
+  transition:transform var(--dur-2) var(--ease-spring), background var(--dur-2);
+}
+.perm-toggle.on {
+  background:var(--brand);
+  border-color:var(--brand);
+}
+.perm-toggle.on::after {
+  transform:translateX(18px);
+  background:#fff;
+}
+.perm-toggle:active::after {
+  transform:scale(.92) translateX(0);
+}
+.perm-toggle.on:active::after {
+  transform:scale(.92) translateX(18px);
+}
+.perm-toggle.denied {
+  background:var(--danger-soft);
+  border-color:color-mix(in srgb, var(--danger) 35%, var(--line));
+}
+.perm-toggle.denied::after {
+  background:var(--danger);
+}
+
+.perm-note {
+  font-size:.72rem; color:var(--text-2);
+  padding:13px var(--s-4); background:var(--surface-2);
+  line-height:1.5; border-top:1px solid var(--line-2);
+  letter-spacing:-.005em;
+}
+
+.support-card {
+  text-align:center; padding:var(--s-6) var(--s-5);
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-lg); box-shadow:var(--e-2);
+  margin-bottom:var(--s-3); position:relative; overflow:hidden;
+}
+.support-card::before {
+  content:''; position:absolute;
+  top:-50px; left:50%; transform:translateX(-50%);
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle, var(--brand-glow) 0%, transparent 62%);
+  filter:blur(28px); opacity:.55; pointer-events:none;
+}
+.support-badge {
+  display:inline-block; background:var(--brand-soft);
+  color:var(--brand); font-size:.66rem; font-weight:750;
+  padding:5px 13px; border-radius:var(--r-pill);
+  margin-bottom:var(--s-3); letter-spacing:.1em;
+  text-transform:uppercase; position:relative;
+}
+.support-card h2 {
+  font-size:1.22rem; font-weight:700; letter-spacing:-.03em;
+  color:var(--text); position:relative;
+}
+.support-card h2 .accent { color:var(--brand); }
+.support-card > p {
+  font-size:.82rem; color:var(--text-2); line-height:1.65;
+  margin-top:var(--s-2); position:relative;
+  max-width:340px; margin-left:auto; margin-right:auto;
+}
+
+.btn-primary {
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:var(--s-2); width:100%; padding:14px 22px;
+  background:linear-gradient(140deg, var(--brand), var(--brand-2));
+  color:#fff; border:none; border-radius:var(--r-sm);
+  font-weight:650; font-size:.9rem; cursor:pointer;
+  transition:transform var(--dur-1) var(--ease-out),
+             box-shadow var(--dur-2), opacity var(--dur-1);
+  text-decoration:none; font-family:inherit;
+  box-shadow:0 8px 22px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,.2);
+  margin-top:var(--s-5); letter-spacing:-.01em;
+  position:relative; overflow:hidden;
+}
+.btn-primary::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(140deg, rgba(255,255,255,.12), transparent 50%);
+  pointer-events:none;
+}
+.btn-primary:active { transform:scale(.97); opacity:.94; }
+.btn-primary svg { width:18px; height:18px; stroke-width:2; position:relative; }
+
+.legal-body {
+  padding:var(--s-3) var(--s-1) var(--s-8);
+  font-size:.83rem; color:var(--text-2);
+  line-height:1.75; max-width:600px;
+}
+.legal-body h3 {
+  font-size:.92rem; font-weight:650; color:var(--text);
+  margin:var(--s-5) 0 var(--s-2); letter-spacing:-.015em;
+}
+.legal-body h3:first-child { margin-top:0; }
+.legal-body p { margin-bottom:var(--s-3); }
+.legal-body ul { margin:0 0 var(--s-3) var(--s-5); }
+.legal-body li { margin-bottom:6px; }
+
+.bottom-nav {
+  position:fixed; bottom:0; left:50%;
+  transform:translateX(-50%); width:100%; max-width:600px; z-index:70;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+  transition:background var(--dur-3);
+}
+.bottom-nav-inner {
+  display:flex; align-items:stretch; justify-content:space-around;
+  height:var(--nav-h);
+  padding:0 max(var(--s-2), env(safe-area-inset-left)) 0 max(var(--s-2), env(safe-area-inset-right));
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px;
+  border:none; background:transparent; color:var(--text-3);
+  cursor:pointer; font-family:inherit; font-size:.64rem;
+  font-weight:650; letter-spacing:.005em; position:relative;
+  transition:color var(--dur-2) var(--ease-out);
+  min-width:0; padding:6px 4px;
+}
+.nav-item .nav-icon-wrap {
+  position:relative; width:48px; height:26px;
+  display:flex; align-items:center; justify-content:center;
+  transition:transform var(--dur-2) var(--ease-spring);
+}
+.nav-item svg {
+  width:22px; height:22px; stroke-width:1.85;
+  transition:stroke var(--dur-2); position:relative; z-index:2;
+}
+.nav-item .nav-indicator {
+  position:absolute; inset:0; border-radius:var(--r-pill);
+  background:var(--brand-soft); opacity:0; transform:scale(.6);
+  transition:opacity var(--dur-2), transform var(--dur-2) var(--ease-spring);
+  z-index:1;
+}
+.nav-item.active { color:var(--brand); }
+.nav-item.active .nav-indicator { opacity:1; transform:scale(1); }
+.nav-item.active .nav-icon-wrap { transform:translateY(-1px); }
+.nav-item:active .nav-icon-wrap { transform:scale(.92); }
+.nav-label {
+  max-width:100%; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; font-size:.64rem; line-height:1.2;
+}
+
+.toast {
+  position:fixed; bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--s-3));
+  left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--text); color:var(--bg);
+  font-size:.78rem; font-weight:550; padding:10px 18px;
+  border-radius:var(--r-pill); box-shadow:var(--e-4); z-index:200;
+  opacity:0; pointer-events:none;
+  transition:opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out);
+  letter-spacing:-.005em; max-width:calc(100% - var(--s-8));
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+@media (min-width:601px) {
+  .app-shell { border-left:1px solid var(--line); border-right:1px solid var(--line); }
+  .bottom-nav { border-left:1px solid var(--line); border-right:1px solid var(--line); }
+}
+@media (min-width:900px) {
+  body { background:var(--surface-3); }
+  .app-shell {
+    max-width:440px; margin:24px auto;
+    min-height:calc(100dvh - 48px); border-radius:28px;
+    overflow:hidden; border:1px solid var(--line); box-shadow:var(--e-4);
+  }
+  .bottom-nav { max-width:440px; border-radius:0 0 28px 28px; }
+}
+@media (max-height:720px) {
+  .orb-stage { min-height:230px; }
+  #zishu-orb-wrapper, #zishu-orb { width:148px; height:148px; }
+  #zishu-orb-visor { width:88px; height:60px; }
+  .orb-ring.r1 { width:180px; height:180px; }
+  .orb-ring.r2 { width:164px; height:164px; }
+  .orb-ring.r3 { width:200px; height:200px; }
+  .orb-halo { width:250px; height:250px; }
+  #zishu-orb-eyes { gap:20px; }
+  #zishu-orb-status { margin-top:var(--s-4); font-size:1rem; }
+  .home-title { font-size:1.4rem; }
+  .conversation-area { max-height:130px; }
+}
+@media (max-width:370px) {
+  .home-title { font-size:1.4rem; }
+  .screen-header h1 { font-size:1.28rem; }
+  .feature-row .fr-sub { display:none; }
+  .conversation-area { max-height:120px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  #zishu-orb-wrapper, .orb-halo, .orb-ring,
+  #zishu-orb::after, .zishu-eye { animation:none !important; }
+}
+::-webkit-scrollbar { width:0; height:0; }
+* { scrollbar-width:none; }
+</style>
+</head>
+<body>
+
+<div class="app-shell" id="appShell">
+
+  <!-- TOP APP BAR -->
+  <header class="app-bar" id="appBar">
+    <div class="app-bar-left">
+      <a class="app-bar-brand" id="brandHome" aria-label="Zishu Home">
+        <span class="logo-mark">Z</span>
+        <span class="brand-text">ZISH<span class="accent">U</span></span>
+      </a>
+      <div class="assistant-status" id="assistantStatus" data-state="ready" aria-live="polite">
+        <span class="status-dot"></span>
+        <span id="assistantStatusText">Ready</span>
+      </div>
+    </div>
+    <div class="app-bar-actions">
+      <button class="icon-btn" id="themeToggleApp" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="screen-viewport">
+
+    <!-- HOME -->
+    <section class="screen active" id="screen-home">
+      <div class="home-wrap">
+
+        <div class="home-top">
+          <div class="home-greeting" id="homeGreeting">Zishu AI</div>
+          <h1 class="home-title" id="homeTitle">Your personal <span class="accent">assistant</span></h1>
+          <p class="home-subtitle" id="assistant-tagline">Talk naturally, ask anything</p>
+        </div>
+
+        <div class="orb-stage">
+          <div id="zishu-orb-container">
+            <div class="orb-halo"></div>
+            <div id="zishu-orb-wrapper">
+              <div class="orb-ring-layer">
+                <div class="orb-ring r1"></div>
+                <div class="orb-ring r2"></div>
+                <div class="orb-ring r3"></div>
+              </div>
+              <div id="zishu-orb">
+                <div id="zishu-orb-visor">
+                  <div id="zishu-orb-eyes">
+                    <div class="zishu-eye left"></div>
+                    <div class="zishu-eye right"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="zishu-orb-status">Tap to talk</div>
+            <div id="zishu-orb-sub">Tap orb to start voice assistant</div>
+          </div>
+        </div>
+
+        <!-- Conversation area -->
+        <div class="conversation-area" id="zishu-chat-container" aria-live="polite" aria-label="Conversation"></div>
+
+        <div class="voice-notice" id="voiceNotice">
+          <div class="notice-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </div>
+          <div class="notice-body">
+            <strong id="voice-notice-title">Getting Zishu ready</strong>
+            <span id="voice-notice-text">Voice startup may take a little longer the first time.</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EXPLORE -->
+    <section class="screen" id="screen-explore">
+      <div class="screen-header">
+        <h1 id="exploreTitle">Explore</h1>
+        <p id="explore-desc">Discover what Zishu can do.</p>
+      </div>
+
+      <div class="section-label" id="features-title">Capabilities</div>
+      <div class="feature-list">
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-voice">Voice interaction</div>
+            <div class="fr-sub">Natural voice input with Hindi + English</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-ai">AI conversations</div>
+            <div class="fr-sub">Ask anything, get smart Hinglish answers</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-call">Phone calls</div>
+            <div class="fr-sub">Call contacts by name with voice</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-sms">SMS &amp; messages</div>
+            <div class="fr-sub">Send messages to contacts by name</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+              <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+              <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+              <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-apps">Open any app</div>
+            <div class="fr-sub">WhatsApp, YouTube, Instagram, Chrome</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-settings">Android settings</div>
+            <div class="fr-sub">WiFi, Bluetooth, display, sound &amp; more</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-search">Web search</div>
+            <div class="fr-sub">Search Google with natural voice</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-location">Location &amp; maps</div>
+            <div class="fr-sub">Open Maps, find places, get directions</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2"/>
+              <path d="M9 22h6M12 6v4"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-device">Device info</div>
+            <div class="fr-sub">Battery, network, storage at a glance</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-flash">Flashlight &amp; controls</div>
+            <div class="fr-sub">Toggle flashlight, volume, vibrate</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-alarm">Alarms &amp; reminders</div>
+            <div class="fr-sub">Set alarms and reminders by voice</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-wake">Wake word</div>
+            <div class="fr-sub">Say "Hey Zishu" to activate</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <div class="fr-body">
+            <div class="fr-title" id="cap-notif">Notifications</div>
+            <div class="fr-sub">Show and manage Android notifications</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label" id="how-title">How it works</div>
+      <div class="steps-card">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Speak</h4>
+            <p>Tell Zishu what you need.</p>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Understand</h4>
+            <p>Zishu processes your request.</p>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Respond</h4>
+            <p>Zishu answers or performs an action.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label" id="use-cases-title">Try saying</div>
+      <div class="chip-wrap">
+        <button class="chip">"Zishu, YouTube kholo"</button>
+        <button class="chip">"Rahul ko call karo"</button>
+        <button class="chip">"Mummy ko message bhejo"</button>
+        <button class="chip">"WiFi settings kholo"</button>
+        <button class="chip">"Battery kitni hai"</button>
+        <button class="chip">"Delhi ka mausam batao"</button>
+        <button class="chip">"125 × 48 calculate karo"</button>
+      </div>
+
+      <div class="section-label" id="privacy-title">Privacy</div>
+      <div class="card">
+        <p id="privacy-desc">Zishu uses a separate backend to handle AI requests so sensitive credentials are not embedded in the client application.</p>
+      </div>
+
+      <div class="section-label" id="faq-title">FAQ</div>
+      <div class="faq-list" id="faqContainer">
+        <div class="faq-item">
+          <div class="faq-question">Can I use Zishu for free? <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="faq-answer">Yes. Zishu can be used without purchasing a subscription or making a payment.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Do I need an account? <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="faq-answer">No. You can use Zishu directly without creating an account or logging in.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Is there a Premium subscription? <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="faq-answer">No. Zishu currently does not require a Premium subscription or paid plan.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">How can I support Zishu? <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="faq-answer">You can use the Support Zishu section to voluntarily support the project through the available UPI payment option.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">What data does Zishu collect? <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+          <div class="faq-answer">Zishu processes voice input solely to respond to your requests. No personal data is stored without consent.</div>
+        </div>
+      </div>
+
+      <div style="height:24px;"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings">
+      <div class="screen-header">
+        <h1 id="settingsTitle">Settings</h1>
+        <p>Preferences, permissions &amp; support</p>
+      </div>
+
+      <div class="section-label">Appearance</div>
+      <div class="settings-group">
+        <div class="settings-row" data-static="true">
+          <div class="sr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/>
+            </svg>
+          </div>
+          <div class="sr-body">
+            <div class="sr-title">Theme</div>
+            <div class="theme-segment" id="themeSegment">
+              <button data-theme-value="light">Light</button>
+              <button data-theme-value="dark">Dark</button>
+              <button data-theme-value="system">System</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Language</div>
+      <div class="settings-group" id="languageGroup">
+        <div class="lang-option" data-lang="en">
+          <div class="lo-label"><span class="lo-flag">🇬🇧</span> English</div>
+          <div class="lo-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        </div>
+        <div class="lang-option" data-lang="hi">
+          <div class="lo-label"><span class="lo-flag">🇮🇳</span> हिन्दी</div>
+          <div class="lo-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        </div>
+      </div>
+
+      <div class="section-label">Permissions</div>
+      <div class="settings-group" id="permissionsGroup">
+        <div class="perm-row" data-perm="microphone">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">Microphone</div>
+            <div class="pr-sub">Required for voice input</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="microphone" role="switch" aria-checked="false" aria-label="Toggle microphone permission"></button>
+        </div>
+        <div class="perm-row" data-perm="speaker">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">Speaker / Audio</div>
+            <div class="pr-sub">Required for voice responses</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="speaker" role="switch" aria-checked="false" aria-label="Toggle speaker permission"></button>
+        </div>
+        <div class="perm-row" data-perm="notifications">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">Notifications</div>
+            <div class="pr-sub">Reminders and alerts</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="notifications" role="switch" aria-checked="false" aria-label="Toggle notifications permission"></button>
+        </div>
+        <div class="perm-row" data-perm="location">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">Location</div>
+            <div class="pr-sub">Weather and local info</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="location" role="switch" aria-checked="false" aria-label="Toggle location permission"></button>
+        </div>
+        <div class="perm-row" data-perm="contacts">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">Contacts</div>
+            <div class="pr-sub">Call &amp; SMS contacts by name</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="contacts" role="switch" aria-checked="false" aria-label="Toggle contacts permission"></button>
+        </div>
+        <div class="perm-row" data-perm="phone">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">Phone</div>
+            <div class="pr-sub">Place calls via voice command</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="phone" role="switch" aria-checked="false" aria-label="Toggle phone permission"></button>
+        </div>
+        <div class="perm-row" data-perm="sms">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">SMS</div>
+            <div class="pr-sub">Send messages via voice command</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="sms" role="switch" aria-checked="false" aria-label="Toggle SMS permission"></button>
+        </div>
+        <div class="perm-row" data-perm="storage">
+          <div class="pr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+              <line x1="6" y1="16" x2="6.01" y2="16"/>
+              <line x1="10" y1="16" x2="10.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="pr-body">
+            <div class="pr-title">Storage</div>
+            <div class="pr-sub">Save notes and reminders</div>
+          </div>
+          <button class="perm-toggle" data-perm-key="storage" role="switch" aria-checked="false" aria-label="Toggle storage permission"></button>
+        </div>
+        <div class="perm-note">
+          Zishu only requests permissions needed for the features you use. You can change these anytime in Android Settings.
+        </div>
+      </div>
+
+      <div class="section-label">Support</div>
+      <div class="settings-group">
+        <div class="settings-row" id="settingsCustomerSupport">
+          <div class="sr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/>
+            </svg>
+          </div>
+          <div class="sr-body">
+            <div class="sr-title">Customer Support</div>
+            <div class="sr-sub">We're here to help</div>
+          </div>
+          <svg class="sr-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="settings-row" id="settingsSupportZishu">
+          <div class="sr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <div class="sr-body">
+            <div class="sr-title">Support Zishu</div>
+            <div class="sr-sub">Voluntary support</div>
+          </div>
+          <svg class="sr-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="section-label">About</div>
+      <div class="settings-group">
+        <div class="settings-row" id="settingsAbout">
+          <div class="sr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </div>
+          <div class="sr-body">
+            <div class="sr-title">About Zishu</div>
+            <div class="sr-sub">Story, creator &amp; vision</div>
+          </div>
+          <svg class="sr-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="settings-row" id="settingsPrivacy">
+          <div class="sr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div class="sr-body">
+            <div class="sr-title">Privacy Policy</div>
+          </div>
+          <svg class="sr-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="settings-row" id="settingsTerms">
+          <div class="sr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6"/>
+            </svg>
+          </div>
+          <div class="sr-body">
+            <div class="sr-title">Terms of Service</div>
+          </div>
+          <svg class="sr-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div style="height:24px;"></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="screen" id="screen-about">
+      <div class="screen-header" style="padding-bottom:0;">
+        <h1 id="aboutTitle">About</h1>
+      </div>
+
+      <div class="about-hero-card" style="margin-top:var(--s-3);">
+        <div class="about-app-icon">Z</div>
+        <h2>Zishu</h2>
+        <p id="about-hero-sub">A premium voice-first AI assistant.</p>
+      </div>
+
+      <div class="section-label" id="about-story-title">The Story</div>
+      <div class="card">
+        <p id="about-story-text">Zishu was created from the idea of building a voice assistant that feels simple and natural to use. The project has been developed progressively, with continuous improvements to voice interaction, AI conversations, user experience, multilingual support, responsive design, assistant tools, accessibility, and overall reliability.</p>
+      </div>
+
+      <div class="section-label" id="about-founder-title">Meet the Creator</div>
+      <div class="card">
+        <div class="founder-row">
+          <div class="founder-avatar">Z</div>
+          <div class="founder-meta">
+            <h3>Zishan</h3>
+            <div class="role">Founder &amp; Developer · Zishu Tron</div>
+            <div class="status">Student</div>
+          </div>
+        </div>
+        <p id="about-founder-bio" style="margin-top:var(--s-3);">Zishu is independently created and developed by Zishan, the founder and developer behind Zishu Tron. The project is being built with a focus on learning, experimentation, product development and creating useful technology.</p>
+      </div>
+
+      <div class="section-label" id="about-brand-title">Built by Zishu Tron</div>
+      <div class="card">
+        <p id="about-brand-text">Zishu Tron is the creative technology brand behind Zishu. The project focuses on building modern digital products and experimenting with new ways technology can become more useful and accessible.</p>
+      </div>
+
+      <div class="section-label" id="about-vision-title">Our Vision</div>
+      <div class="card">
+        <p id="about-vision-text">Technology should feel useful, simple and accessible. The long-term vision for Zishu is to continue improving the assistant so that interacting with AI becomes easier and more natural for everyday users.</p>
+      </div>
+
+      <div class="section-label" id="about-capabilities-title">What Zishu Can Do</div>
+      <div class="card">
+        <p id="about-capabilities-desc">Zishu is designed to help you with everyday tasks using voice and text.</p>
+        <ul class="capability-list" id="about-capabilities-list">
+          <li>Voice interaction</li>
+          <li>Text conversations</li>
+          <li>AI answers</li>
+          <li>Weather</li>
+          <li>Time</li>
+          <li>Calculations</li>
+          <li>Translation</li>
+          <li>Notes</li>
+          <li>Reminders</li>
+          <li>Website assistance</li>
+        </ul>
+      </div>
+
+      <div class="section-label" id="about-message-title">A Message from the Creator</div>
+      <div class="founder-quote" id="about-message-text">
+        Zishu started as an idea to build something useful and has grown into an ongoing project focused on AI, voice interaction and better digital experiences. My goal is to keep learning, building and improving Zishu step by step while creating technology that people can actually enjoy using.
+        <div class="signature">— Zishan, Founder &amp; Developer, Zishu Tron</div>
+      </div>
+
+      <div style="height:24px;"></div>
+    </section>
+
+    <!-- SUPPORT ZISHU -->
+    <section class="screen" id="screen-support-zishu">
+      <div class="screen-header" style="padding-bottom:0;">
+        <h1 id="supportTitle">Support Zishu</h1>
+      </div>
+
+      <div class="support-card" style="margin-top:var(--s-3);">
+        <div class="support-badge">Voluntary</div>
+        <h2>Support <span class="accent">Zishu</span></h2>
+        <p id="support-zishu-desc">If you enjoy using Zishu and would like to support its continued development, you can support the project voluntarily.</p>
+        <a class="btn-primary" href="upi://pay?pa=7654613259@fam&pn=Zishu%20AI" id="supportUpiBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/>
+          </svg>
+          Support Zishu
+        </a>
+      </div>
+
+      <div class="card">
+        <p>Your support helps keep Zishu running and enables future improvements. Thank you for being part of this journey.</p>
+      </div>
+
+      <div style="height:24px;"></div>
+    </section>
+
+    <!-- CUSTOMER SUPPORT -->
+    <section class="screen" id="screen-customer-support">
+      <div class="screen-header" style="padding-bottom:0;">
+        <h1 id="customer-support-title">Customer Support</h1>
+      </div>
+
+      <div class="support-card" style="margin-top:var(--s-3);">
+        <div class="support-badge">Support</div>
+        <h2>Contact Us</h2>
+        <p id="customer-support-desc">Need help? We're here for you.</p>
+        <a href="mailto:support.stardustofficial@gmail.com" class="btn-primary" id="customerSupportEmailBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          support.stardustofficial@gmail.com
+        </a>
+      </div>
+
+      <div class="card">
+        <p id="customer-support-info">We typically respond within 24-48 hours. For urgent issues, please include "URGENT" in the subject line.</p>
+      </div>
+
+      <div style="height:24px;"></div>
+    </section>
+
+    <!-- PRIVACY -->
+    <section class="screen" id="screen-privacy">
+      <div class="screen-header">
+        <h1>Privacy Policy</h1>
+        <p>Last updated: 2026</p>
+      </div>
+      <div class="legal-body">
+        <h3>1. What We Process</h3>
+        <p>Zishu processes the following only when you actively use a feature that requires it:</p>
+        <ul>
+          <li><strong>Voice input</strong> — sent to our secure backend to generate AI responses</li>
+          <li><strong>Text input</strong> — same purpose as voice</li>
+          <li><strong>Contacts</strong> — read only when you ask Zishu to call or message a contact by name</li>
+          <li><strong>Phone state</strong> — used only when placing a call via voice command</li>
+          <li><strong>Location</strong> — requested only for weather, maps, or location-based queries</li>
+          <li><strong>Device info</strong> — battery, network, storage, read only when you ask</li>
+          <li><strong>Local storage</strong> — notes, reminders, alarms, and preferences are saved on your device only</li>
+        </ul>
+
+        <h3>2. How We Use It</h3>
+        <p>Voice and text are sent to our backend only to generate a response. Contacts, SMS, calls, apps, settings, and location are accessed only when you issue a matching voice command. We do not sell your data to third parties.</p>
+
+        <h3>3. Data Retention</h3>
+        <p>Conversation history is stored locally on your device. Notes, reminders, and alarms are stored in your device's local storage. You can clear all of it by clearing Zishu's app data from Android Settings.</p>
+
+        <h3>4. Third-Party Services</h3>
+        <p>Zishu uses a separate backend to handle AI requests so sensitive API credentials are never embedded in the client app. Network requests to third-party services (Google Maps, web search) follow their respective privacy policies.</p>
+
+        <h3>5. Permissions</h3>
+        <p>You can grant or deny each permission from Zishu Settings or Android Settings. Denying a permission disables only the features that need it — the rest of Zishu continues to work.</p>
+
+        <h3>6. Children</h3>
+        <p>Zishu is not intended for children under 13. We do not knowingly collect data from children.</p>
+
+        <h3>7. Contact</h3>
+        <p>For privacy-related questions, email <strong>support.stardustofficial@gmail.com</strong>.</p>
+      </div>
+    </section>
+
+    <!-- TERMS -->
+    <section class="screen" id="screen-terms">
+      <div class="screen-header">
+        <h1>Terms of Service</h1>
+        <p>Last updated: 2026</p>
+      </div>
+      <div class="legal-body">
+        <h3>1. Acceptance of Terms</h3>
+        <p>By installing or using Zishu, you agree to these terms. If you do not agree, please uninstall the app.</p>
+
+        <h3>2. Use of Service</h3>
+        <p>Zishu is provided for personal, non-commercial use. You agree not to:</p>
+        <ul>
+          <li>Misuse the service or attempt to disrupt its operation</li>
+          <li>Use Zishu for unlawful activities or harassment</li>
+          <li>Attempt to reverse-engineer, copy, or redistribute the app</li>
+          <li>Bypass permission prompts or security features</li>
+        </ul>
+
+        <h3>3. Voice Commands &amp; Device Actions</h3>
+        <p>Zishu can open apps, place calls, send SMS, open settings, toggle flashlight, and read device info when you issue a matching voice command. You are responsible for the commands you give. Zishu asks for confirmation before sensitive actions such as calls and SMS.</p>
+
+        <h3>4. AI Responses</h3>
+        <p>AI responses are generated by third-party models and may occasionally be incorrect or incomplete. Do not rely on Zishu for medical, legal, financial, or safety-critical decisions.</p>
+
+        <h3>5. No Warranty</h3>
+        <p>Zishu is provided "as is" without warranties of any kind, express or implied. We do not guarantee uninterrupted, error-free, or accurate operation.</p>
+
+        <h3>6. Limitation of Liability</h3>
+        <p>To the maximum extent permitted by law, Zishu Tron and its developer are not liable for any indirect, incidental, or consequential damages arising from your use of Zishu.</p>
+
+        <h3>7. Changes to Terms</h3>
+        <p>We may update these terms from time to time. Continued use of Zishu after changes constitutes acceptance of the new terms.</p>
+
+        <h3>8. Contact</h3>
+        <p>For questions about these terms, email <strong>support.stardustofficial@gmail.com</strong>.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
+    <div class="bottom-nav-inner">
+      <button class="nav-item active" data-screen="home" aria-label="Home">
+        <span class="nav-icon-wrap">
+          <span class="nav-indicator"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 10.5L12 3l9 7.5"/>
+            <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/>
+          </svg>
+        </span>
+        <span class="nav-label" id="nav-home-label">Home</span>
+      </button>
+      <button class="nav-item" data-screen="explore" aria-label="Explore">
+        <span class="nav-icon-wrap">
+          <span class="nav-indicator"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/>
+          </svg>
+        </span>
+        <span class="nav-label" id="nav-explore-label">Explore</span>
+      </button>
+      <button class="nav-item" data-screen="settings" aria-label="Settings">
+        <span class="nav-icon-wrap">
+          <span class="nav-indicator"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </span>
+        <span class="nav-label" id="nav-settings-label">Settings</span>
+      </button>
+    </div>
+  </nav>
+
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   TOAST
+   ============================================================ */
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+
+/* ============================================================
+   LANGUAGE
+   ============================================================ */
+(function languageManager() {
+  const LANG_STORAGE_KEY = 'zishu-language';
+  let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || 'en';
+
+  const translations = {
+    en: {
+      'nav-home':'Home','nav-explore':'Explore','nav-settings':'Settings',
+      'assistant-tagline':'Talk naturally, ask anything',
+      'home-greeting':'Zishu AI',
+      'home-title':'Your personal <span class="accent">assistant</span>',
+      'orb-status-idle':'Tap to talk',
+      'orb-sub-idle':'Tap orb to start voice assistant',
+      'voice-notice-title':'Getting Zishu ready',
+      'voice-notice-text':'Voice startup may take a little longer the first time.',
+      'explore-desc':'Discover what Zishu can do.',
+      'features-title':'Capabilities','how-title':'How it works',
+      'use-cases-title':'Try saying','privacy-title':'Privacy',
+      'privacy-desc':'Zishu uses a separate backend to handle AI requests so sensitive credentials are not embedded in the client application.',
+      'faq-title':'FAQ',
+      'support-zishu-desc':'If you enjoy using Zishu and would like to support its continued development, you can support the project voluntarily.',
+      'customer-support-title':'Customer Support',
+      'customer-support-desc':'Need help? We\'re here for you.',
+      'customer-support-info':'We typically respond within 24-48 hours. For urgent issues, please include "URGENT" in the subject line.',
+      'about-hero-desc':'Zishu is an AI voice assistant created to make interacting with technology feel more natural, simple and personal.',
+      'about-hero-sub':'A premium voice-first AI assistant.',
+      'about-story-title':'The Story',
+      'about-story-text':'Zishu was created from the idea of building a voice assistant that feels simple and natural to use. The project has been developed progressively, with continuous improvements to voice interaction, AI conversations, user experience, multilingual support, responsive design, assistant tools, accessibility, and overall reliability.',
+      'about-founder-title':'Meet the Creator',
+      'about-founder-bio':'Zishu is independently created and developed by Zishan, the founder and developer behind Zishu Tron. The project is being built with a focus on learning, experimentation, product development and creating useful technology.',
+      'about-brand-title':'Built by Zishu Tron',
+      'about-brand-text':'Zishu Tron is the creative technology brand behind Zishu. The project focuses on building modern digital products and experimenting with new ways technology can become more useful and accessible.',
+      'about-vision-title':'Our Vision',
+      'about-vision-text':'Technology should feel useful, simple and accessible. The long-term vision for Zishu is to continue improving the assistant so that interacting with AI becomes easier and more natural for everyday users.',
+      'about-capabilities-title':'What Zishu Can Do',
+      'about-capabilities-desc':'Zishu is designed to help you with everyday tasks using voice and text.',
+      'about-message-title':'A Message from the Creator',
+      'about-message-text':'Zishu started as an idea to build something useful and has grown into an ongoing project focused on AI, voice interaction and better digital experiences. My goal is to keep learning, building and improving Zishu step by step while creating technology that people can actually enjoy using.',
+      'cap-voice':'Voice interaction','cap-ai':'AI conversations','cap-translate':'Translation',
+      'cap-calc':'Calculations','cap-weather':'Weather & time','cap-notes':'Notes & reminders',
+      'status-ready':'Ready','status-listening':'Listening','status-thinking':'Thinking','status-speaking':'Speaking',
+    },
+    hi: {
+      'nav-home':'होम','nav-explore':'एक्सप्लोर','nav-settings':'सेटिंग्स',
+      'assistant-tagline':'स्वाभाविक रूप से बात करें, कुछ भी पूछें',
+      'home-greeting':'Zishu AI',
+      'home-title':'आपका निजी <span class="accent">सहायक</span>',
+      'orb-status-idle':'बात करने के लिए टैप करें',
+      'orb-sub-idle':'वॉइस असिस्टेंट शुरू करने के लिए ऑर्ब टैप करें',
+      'voice-notice-title':'Zishu तैयार हो रहा है',
+      'voice-notice-text':'पहली बार वॉइस स्टार्टअप में थोड़ा समय लग सकता है।',
+      'explore-desc':'जानें Zishu क्या कर सकता है।',
+      'features-title':'क्षमताएँ','how-title':'यह कैसे काम करता है',
+      'use-cases-title':'कहकर देखें','privacy-title':'गोपनीयता',
+      'privacy-desc':'Zishu AI अनुरोधों को संभालने के लिए एक अलग बैकेंड का उपयोग करता है ताकि संवेदनशील क्रेडेंशियल्स सीधे क्लाइंट एप्लिकेशन में एम्बेड न हों।',
+      'faq-title':'सामान्य प्रश्न',
+      'support-zishu-desc':'यदि आप Zishu का उपयोग करना पसंद करते हैं और इसके निरंतर विकास का समर्थन करना चाहते हैं, तो आप स्वेच्छा से परियोजना का समर्थन कर सकते हैं।',
+      'customer-support-title':'ग्राहक सहायता',
+      'customer-support-desc':'मदद चाहिए? हम आपके लिए यहाँ हैं।',
+      'customer-support-info':'हम आमतौर पर 24-48 घंटों के भीतर जवाब देते हैं। तत्काल मामलों के लिए, कृपया विषय पंक्ति में "URGENT" शामिल करें।',
+      'about-hero-desc':'Zishu एक AI वॉइस असिस्टेंट है जिसे तकनीक के साथ बातचीत को अधिक प्राकृतिक, सरल और व्यक्तिगत बनाने के लिए बनाया गया है।',
+      'about-hero-sub':'एक प्रीमियम वॉइस-फर्स्ट AI सहायक।',
+      'about-story-title':'कहानी',
+      'about-story-text':'Zishu एक ऐसा वॉइस असिस्टेंट बनाने के विचार से बनाया गया था जो उपयोग करने में सरल और प्राकृतिक लगे। इस परियोजना को धीरे-धीरे विकसित किया गया है, जिसमें वॉइस इंटरैक्शन, AI संवाद, उपयोगकर्ता अनुभव, बहुभाषी समर्थन, उत्तरदायी डिज़ाइन और समग्र विश्वसनीयता में निरंतर सुधार किए गए हैं।',
+      'about-founder-title':'निर्माता से मिलें',
+      'about-founder-bio':'Zishu को स्वतंत्र रूप से Zishan द्वारा बनाया और विकसित किया गया है, जो Zishu Tron के संस्थापक और डेवलपर हैं। यह परियोजना सीखने, प्रयोग, उत्पाद विकास और उपयोगी तकनीक बनाने पर केंद्रित है।',
+      'about-brand-title':'Zishu Tron द्वारा निर्मित',
+      'about-brand-text':'Zishu Tron Zishu के पीछे का क्रिएटिव टेक्नोलॉजी ब्रांड है। यह परियोजना आधुनिक डिजिटल उत्पादों के निर्माण और नए तरीकों के साथ प्रयोग करने पर केंद्रित है ताकि तकनीक अधिक उपयोगी और सुलभ हो सके।',
+      'about-vision-title':'हमारा दृष्टिकोण',
+      'about-vision-text':'तकनीक उपयोगी, सरल और सुलभ होनी चाहिए। Zishu के लिए दीर्घकालिक दृष्टिकोण सहायक में सुधार जारी रखना है ताकि AI के साथ बातचीत करना आम उपयोगकर्ताओं के लिए आसान और अधिक प्राकृतिक हो जाए।',
+      'about-capabilities-title':'Zishu क्या कर सकता है',
+      'about-capabilities-desc':'Zishu को वॉइस और टेक्स्ट का उपयोग करके दैनिक कार्यों में आपकी मदद करने के लिए डिज़ाइन किया गया है।',
+      'about-message-title':'निर्माता का संदेश',
+      'about-message-text':'Zishu कुछ उपयोगी बनाने के विचार से शुरू हुआ और AI, वॉइस इंटरैक्शन और बेहतर डिजिटल अनुभवों पर केंद्रित एक चल रही परियोजना में विकसित हुआ है। मेरा लक्ष्य सीखते रहना, निर्माण करते रहना और Zishu को चरण-दर-चरण सुधारते रहना है।',
+      'cap-voice':'वॉइस इंटरैक्शन','cap-ai':'AI संवाद','cap-translate':'अनुवाद',
+      'cap-calc':'गणनाएँ','cap-weather':'मौसम और समय','cap-notes':'नोट्स और रिमाइंडर',
+      'status-ready':'तैयार','status-listening':'सुन रहा हूँ','status-thinking':'सोच रहा हूँ','status-speaking':'बोल रहा हूँ',
+    }
+  };
+
+  function getTranslation(key) {
+    return translations[currentLang]?.[key] || translations.en[key] || key;
+  }
+
+  function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
+
+    document.querySelectorAll('.nav-label').forEach(el => {
+      const screen = el.closest('.nav-item')?.getAttribute('data-screen');
+      if (screen) el.textContent = getTranslation('nav-' + screen);
+    });
+
+    const idMap = {
+      'assistant-tagline':'assistant-tagline','homeGreeting':'home-greeting',
+      'explore-desc':'explore-desc','features-title':'features-title',
+      'how-title':'how-title','use-cases-title':'use-cases-title',
+      'privacy-title':'privacy-title','privacy-desc':'privacy-desc',
+      'faq-title':'faq-title','support-zishu-desc':'support-zishu-desc',
+      'customer-support-title':'customer-support-title',
+      'customer-support-desc':'customer-support-desc',
+      'customer-support-info':'customer-support-info',
+      'about-hero-desc':'about-hero-desc','about-hero-sub':'about-hero-sub',
+      'about-story-title':'about-story-title','about-story-text':'about-story-text',
+      'about-founder-title':'about-founder-title','about-founder-bio':'about-founder-bio',
+      'about-brand-title':'about-brand-title','about-brand-text':'about-brand-text',
+      'about-vision-title':'about-vision-title','about-vision-text':'about-vision-text',
+      'about-capabilities-title':'about-capabilities-title',
+      'about-capabilities-desc':'about-capabilities-desc',
+      'about-message-title':'about-message-title','about-message-text':'about-message-text',
+      'cap-voice':'cap-voice','cap-ai':'cap-ai','cap-translate':'cap-translate',
+      'cap-calc':'cap-calc','cap-weather':'cap-weather','cap-notes':'cap-notes',
+      'voice-notice-title':'voice-notice-title','voice-notice-text':'voice-notice-text',
+    };
+    Object.keys(idMap).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = getTranslation(idMap[id]);
+    });
+
+    const homeTitle = document.getElementById('homeTitle');
+    if (homeTitle) homeTitle.innerHTML = getTranslation('home-title');
+
+    if (!document.getElementById('zishu-orb-wrapper').classList.contains('listening') &&
+        !document.getElementById('zishu-orb-wrapper').classList.contains('thinking') &&
+        !document.getElementById('zishu-orb-wrapper').classList.contains('speaking')) {
+      const orbStatus = document.getElementById('zishu-orb-status');
+      const orbSub = document.getElementById('zishu-orb-sub');
+      if (orbStatus) orbStatus.textContent = getTranslation('orb-status-idle');
+      if (orbSub) orbSub.textContent = getTranslation('orb-sub-idle');
+    }
+
+    document.querySelectorAll('.lang-option').forEach(opt => {
+      opt.classList.toggle('active', opt.getAttribute('data-lang') === lang);
+    });
+    document.documentElement.lang = lang === 'hi' ? 'hi' : 'en';
+  }
+
+  window.__getTranslation = getTranslation;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    applyLanguage(currentLang);
+    document.querySelectorAll('.lang-option').forEach(opt => {
+      opt.addEventListener('click', function() {
+        applyLanguage(this.getAttribute('data-lang'));
+        showToast(currentLang === 'hi' ? 'भाषा बदल गई' : 'Language updated');
+      });
+    });
+  });
+  if (document.readyState === 'complete') applyLanguage(currentLang);
+  else window.addEventListener('load', () => applyLanguage(currentLang));
+})();
+
+
+/* ============================================================
+   APP NAVIGATION + THEME
+   ============================================================ */
+(function appNavigation() {
+  const html = document.documentElement;
+  const themeToggleApp = document.getElementById('themeToggleApp');
+  const themeSegment = document.getElementById('themeSegment');
+
+  function resolveTheme(value) {
+    if (value === 'system') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return value;
+  }
+
+  function applyTheme(value) {
+    const resolved = resolveTheme(value);
+    html.setAttribute('data-theme', resolved);
+    localStorage.setItem('zishu-theme', value);
+
+    if (themeSegment) {
+      themeSegment.querySelectorAll('button').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-theme-value') === value);
+      });
+    }
+    if (themeToggleApp) {
+      themeToggleApp.innerHTML = resolved === 'dark'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;stroke-width:1.9"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;stroke-width:1.9"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    }
+  }
+
+  applyTheme(localStorage.getItem('zishu-theme') || 'system');
+
+  if (themeToggleApp) {
+    themeToggleApp.addEventListener('click', () => {
+      const current = localStorage.getItem('zishu-theme') || 'system';
+      const resolved = resolveTheme(current);
+      applyTheme(resolved === 'dark' ? 'light' : 'dark');
+    });
+  }
+  if (themeSegment) {
+    themeSegment.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => applyTheme(btn.getAttribute('data-theme-value')));
+    });
+  }
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem('zishu-theme') || 'system') === 'system') applyTheme('system');
+  });
+
+  const screens = document.querySelectorAll('.screen');
+  const navItems = document.querySelectorAll('.nav-item');
+  let currentScreen = 'home';
+
+  function switchScreen(name, pushHash = true) {
+    if (name === currentScreen) return;
+    screens.forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('screen-' + name);
+    if (target) target.classList.add('active');
+
+    navItems.forEach(item => {
+      item.classList.toggle('active', item.getAttribute('data-screen') === name);
+    });
+
+    currentScreen = name;
+    if (pushHash) {
+      if (name === 'home') history.pushState(null, '', window.location.pathname);
+      else history.pushState(null, '', '#' + name);
+    }
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  window.__switchScreen = switchScreen;
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => switchScreen(item.getAttribute('data-screen')));
+  });
+  document.getElementById('brandHome').addEventListener('click', e => {
+    e.preventDefault(); switchScreen('home');
+  });
+  document.getElementById('settingsCustomerSupport').addEventListener('click', () => switchScreen('customer-support'));
+  document.getElementById('settingsSupportZishu').addEventListener('click', () => switchScreen('support-zishu'));
+  document.getElementById('settingsAbout').addEventListener('click', () => switchScreen('about'));
+  document.getElementById('settingsPrivacy').addEventListener('click', () => switchScreen('privacy'));
+  document.getElementById('settingsTerms').addEventListener('click', () => switchScreen('terms'));
+
+  function handleHash() {
+    const hash = window.location.hash.replace('#', '');
+    const valid = ['home','explore','settings','about','support-zishu','customer-support','privacy','terms'];
+    if (hash && valid.includes(hash)) switchScreen(hash, false);
+    else switchScreen('home', false);
+  }
+  window.addEventListener('hashchange', handleHash);
+  if (document.readyState === 'complete') handleHash();
+  else window.addEventListener('load', handleHash);
+
+  const appBar = document.getElementById('appBar');
+  window.addEventListener('scroll', () => {
+    appBar.classList.toggle('scrolled', window.scrollY > 6);
+  }, { passive:true });
+
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-question').addEventListener('click', () => {
+      item.classList.toggle('open');
+    });
+  });
+
+  /* Permissions — toggle switch (on = granted, off = denied) */
+  const PERM_STORAGE_KEY = 'zishu-permissions';
+  let permissions = {};
+  try { permissions = JSON.parse(localStorage.getItem(PERM_STORAGE_KEY) || '{}'); } catch(e) { permissions = {}; }
+
+  function savePermissions() {
+    localStorage.setItem(PERM_STORAGE_KEY, JSON.stringify(permissions));
+  }
+
+  function updatePermToggle(toggle, permKey) {
+    const state = permissions[permKey];
+    toggle.classList.toggle('on', state === 'granted');
+    toggle.classList.toggle('denied', state === 'denied');
+    toggle.setAttribute('aria-checked', state === 'granted' ? 'true' : 'false');
+  }
+
+  function requestNativePermission(permKey, grant) {
+    try {
+      if (typeof window.ZishuAndroid !== 'undefined' && window.ZishuAndroid !== null) {
+        if (typeof window.ZishuAndroid.requestPermission === 'function') {
+          window.ZishuAndroid.requestPermission(permKey);
+          return true;
+        }
+      }
+    } catch (e) { console.warn('[Zishu Native] requestPermission error:', e); }
+    return false;
+  }
+
+  document.querySelectorAll('.perm-toggle').forEach(toggle => {
+    const permKey = toggle.getAttribute('data-perm-key');
+    updatePermToggle(toggle, permKey);
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const currentState = permissions[permKey];
+      // Toggle: granted -> unset, otherwise -> granted
+      let nextState;
+      if (currentState === 'granted') {
+        nextState = undefined;
+      } else {
+        nextState = 'granted';
+        requestNativePermission(permKey, true);
+      }
+
+      if (nextState === undefined) {
+        delete permissions[permKey];
+      } else {
+        permissions[permKey] = nextState;
+      }
+      savePermissions();
+      updatePermToggle(toggle, permKey);
+
+      // Update icon tint based on state
+      const row = toggle.closest('.perm-row');
+      const icon = row?.querySelector('.pr-icon');
+      if (icon) {
+        if (permissions[permKey] === 'granted') {
+          icon.style.background = 'var(--success-soft)';
+          icon.style.color = 'var(--success)';
+        } else {
+          icon.style.background = '';
+          icon.style.color = '';
+        }
+      }
+
+      const permName = row?.querySelector('.pr-title')?.textContent || permKey;
+      if (permissions[permKey] === 'granted') showToast(`${permName} allowed`);
+      else showToast(`${permName} off`);
+    });
+
+    // Initialize icon tint based on stored state
+    const row = toggle.closest('.perm-row');
+    const icon = row?.querySelector('.pr-icon');
+    if (icon && permissions[permKey] === 'granted') {
+      icon.style.background = 'var(--success-soft)';
+      icon.style.color = 'var(--success)';
+    }
+  });
+})();
+
+
+/* ============================================================
+   FULL ZISHU AI ASSISTANT SYSTEM
+   ============================================================ */
+(function zishuAssistant() {
+  // ============================================================
+  // CONFIG
+  // ============================================================
+  const BACKEND_URL = 'https://zishu-backend.onrender.com/api/chat';
+
+  // ============================================================
+  // DEVANAGARI → HINGLISH TRANSLITERATION
+   // ============================================================
+  // NOTE: This map is used ONLY for contact matching / local use cases.
+  // It is NOT applied to the AI backend query anymore (see handleUserQuery below).
+  // The AI backend receives the original user query verbatim so that Hindi/Devanagari
+  // questions reach the backend unchanged.
+  // ============================================================
+  const DEVANAGARI_TO_HINGLISH = {
+    'मैं': 'main', 'मुझे': 'mujhe', 'मेरा': 'mera', 'मेरी': 'meri', 'मेरे': 'mere',
+    'तुम': 'tum', 'तुम्हें': 'tumhe', 'तुम्हारा': 'tumhara', 'तुम्हारी': 'tumhari',
+    'आप': 'aap', 'आपका': 'aapka', 'आपकी': 'aapki', 'आपके': 'aapke',
+    'हम': 'hum', 'हमें': 'humein', 'हमारा': 'hamara', 'हमारी': 'hamari',
+    'यह': 'yeh', 'ये': 'ye', 'वह': 'wo', 'वो': 'wo',
+    'क्या': 'kya', 'क्यों': 'kyon', 'कैसे': 'kaise', 'कहाँ': 'kahan', 'कहां': 'kahan',
+    'कब': 'kab', 'कौन': 'kaun', 'कितना': 'kitna', 'कितनी': 'kitni', 'कितने': 'kitne',
+    'है': 'hai', 'हैं': 'hain', 'था': 'tha', 'थी': 'thi', 'थे': 'the',
+    'हो': 'ho', 'होगा': 'hoga', 'होगी': 'hogi', 'होंगे': 'honge',
+    'कर': 'kar', 'करो': 'karo', 'करना': 'karna', 'करता': 'karta', 'करती': 'karti',
+    'किया': 'kiya', 'किए': 'kiye', 'करें': 'karen', 'करेंगे': 'karenge',
+    'कह': 'keh', 'कहो': 'keho', 'कहना': 'kehna', 'कहा': 'keha',
+    'बता': 'bata', 'बताओ': 'batao', 'बताना': 'batana', 'बताया': 'bataya',
+    'दे': 'de', 'दो': 'do', 'देना': 'dena', 'दिया': 'diya',
+    'ले': 'le', 'लो': 'lo', 'लेना': 'lena', 'लिया': 'liya',
+    'जा': 'ja', 'जाओ': 'jao', 'जाना': 'jana', 'गया': 'gaya', 'गई': 'gayi',
+    'आ': 'aa', 'आओ': 'aao', 'आना': 'aana', 'आया': 'aaya', 'आई': 'aayi',
+    'खोल': 'khol', 'खोलो': 'kholo', 'खोलना': 'kholna', 'खोला': 'khola',
+    'बंद': 'band', 'चालू': 'chalu', 'शुरू': 'shuru',
+    'चला': 'chala', 'चलाओ': 'chalao', 'चलाना': 'chalana',
+    'सुन': 'sun', 'सुनो': 'suno', 'सुनना': 'sunna', 'सुना': 'suna',
+    'बोल': 'bol', 'बोलो': 'bolo', 'बोलना': 'bolna', 'बोला': 'bola',
+    'पूछ': 'pooch', 'पूछो': 'poocho', 'पूछना': 'poochna',
+    'दिखा': 'dikha', 'दिखाओ': 'dikhao', 'दिखाना': 'dikhana',
+    'समझ': 'samajh', 'समझो': 'samjho', 'समझना': 'samajhna',
+    'जान': 'jaan', 'जानो': 'jaano', 'जानना': 'jaanna',
+    'मिल': 'mil', 'मिलो': 'milo', 'मिलना': 'milna',
+    'रुक': 'ruk', 'रुको': 'ruko', 'रुकना': 'rukna',
+    'सोच': 'soch', 'सोचो': 'socho', 'सोचना': 'sochna',
+    'पढ़': 'padh', 'पढ़ो': 'padho', 'पढ़ना': 'padhna',
+    'लिख': 'likh', 'लिखो': 'likho', 'लिखना': 'likhna',
+    'भेज': 'bhej', 'भेजो': 'bhejo', 'भेजना': 'bhejna',
+    'लगा': 'laga', 'लगाओ': 'lagao', 'लगाना': 'lagana',
+    'रख': 'rakh', 'रखो': 'rakho', 'रखना': 'rakhna',
+    'पी': 'pi', 'पियो': 'piyo', 'पीना': 'peena',
+    'खा': 'kha', 'खाओ': 'khao', 'खाना': 'khana',
+    'नाम': 'naam', 'काम': 'kaam', 'समय': 'samay', 'दिन': 'din', 'रात': 'raat',
+    'सुबह': 'subah', 'शाम': 'shaam', 'दोपहर': 'dopahar',
+    'आज': 'aaj', 'कल': 'kal', 'परसों': 'parson', 'अभी': 'abhi',
+    'घर': 'ghar', 'बाहर': 'bahar', 'अंदर': 'andar', 'ऊपर': 'upar', 'नीचे': 'neeche',
+    'पानी': 'paani', 'खाना': 'khaana', 'चाय': 'chai', 'कॉफी': 'coffee',
+    'दोस्त': 'dost', 'भाई': 'bhai', 'बहन': 'behen', 'माँ': 'maa', 'मां': 'maa', 'पापा': 'papa',
+    'बेटा': 'beta', 'बेटी': 'beti', 'पत्नी': 'patni', 'पति': 'pati',
+    'नंबर': 'number', 'फोन': 'phone', 'मोबाइल': 'mobile', 'कॉल': 'call',
+    'मैसेज': 'message', 'संदेश': 'sandesh', 'ईमेल': 'email',
+    'नोट': 'note', 'नोट्स': 'notes', 'रिमाइंडर': 'reminder',
+    'अलार्म': 'alarm', 'समाचार': 'samachar', 'खबर': 'khabar',
+    'मौसम': 'mausam', 'बारिश': 'barish', 'धूप': 'dhoop', 'ठंड': 'thand', 'गर्मी': 'garmi',
+    'पैसा': 'paisa', 'पैसे': 'paise', 'रुपये': 'rupaye', 'कीमत': 'keemat',
+    'जगह': 'jagah', 'शहर': 'shahar', 'गाँव': 'gaon', 'गांव': 'gaon', 'देश': 'desh',
+    'स्कूल': 'school', 'कॉलेज': 'college', 'ऑफिस': 'office', 'कंपनी': 'company',
+    'किताब': 'kitaab', 'किताबें': 'kitaabein', 'फिल्म': 'film', 'गाना': 'gaana', 'गाने': 'gaane',
+    'खेल': 'khel', 'मैच': 'match', 'टीम': 'team',
+    'बीमार': 'beemar', 'दवा': 'dawa', 'डॉक्टर': 'doctor', 'अस्पताल': 'aspataal',
+    'सेटिंग': 'setting', 'सेटिंग्स': 'settings', 'वाईफाई': 'wifi', 'ब्लूटूथ': 'bluetooth',
+    'कैमरा': 'camera', 'गैलरी': 'gallery', 'फोटो': 'photo', 'वीडियो': 'video',
+    'ऐप': 'app', 'ऐप्स': 'apps', 'वेबसाइट': 'website',
+    'यूट्यूब': 'youtube', 'इंस्टाग्राम': 'instagram', 'फेसबुक': 'facebook',
+    'व्हाट्सएप': 'whatsapp', 'व्हाट्सऐप': 'whatsapp', 'टेलीग्राम': 'telegram',
+    'जीमेल': 'gmail', 'गूगल': 'google', 'क्रोम': 'chrome',
+    'मैप': 'map', 'मैप्स': 'maps', 'नक्शा': 'naksha',
+    'अच्छा': 'achha', 'अच्छी': 'achhi', 'अच्छे': 'achhe',
+    'बुरा': 'bura', 'बुरी': 'buri', 'बुरे': 'bure',
+    'बड़ा': 'bada', 'बड़ी': 'badi', 'बड़े': 'bade',
+    'छोटा': 'chhota', 'छोटी': 'chhoti', 'छोटे': 'chhote',
+    'नया': 'naya', 'नई': 'nayi', 'नए': 'naye',
+    'पुराना': 'purana', 'पुरानी': 'purani', 'पुराने': 'purane',
+    'जल्दी': 'jaldi', 'धीरे': 'dheere', 'फिर': 'phir', 'फ़िर': 'phir',
+    'बहुत': 'bahut', 'थोड़ा': 'thoda', 'थोड़ी': 'thodi', 'थोड़े': 'thode',
+    'सब': 'sab', 'सबकुछ': 'sabkuch', 'कुछ': 'kuch', 'कोई': 'koi',
+    'और': 'aur', 'या': 'ya', 'लेकिन': 'lekin', 'पर': 'par', 'मगर': 'magar',
+    'भी': 'bhi', 'तो': 'to', 'ही': 'hi', 'ना': 'na', 'नहीं': 'nahi', 'नही': 'nahi',
+    'हाँ': 'haan', 'हां': 'haan', 'जी': 'ji', 'ठीक': 'theek', 'ठीक है': 'theek hai',
+    'बाद': 'baad', 'पहले': 'pehle', 'पहली': 'pehli',
+    'यहाँ': 'yahan', 'यहां': 'yahan', 'वहाँ': 'wahan', 'वहां': 'wahan',
+    'एक': 'ek', 'दो': 'do', 'तीन': 'teen', 'चार': 'chaar', 'पाँच': 'paanch', 'पांच': 'paanch',
+    'छह': 'chhe', 'सात': 'saat', 'आठ': 'aath', 'नौ': 'nau', 'दस': 'das',
+    'बीस': 'bees', 'तीस': 'tees', 'चालीस': 'chalees', 'पचास': 'pachaas',
+    'साठ': 'saath', 'सत्तर': 'sattar', 'अस्सी': 'assi', 'नब्बे': 'nabbe', 'सौ': 'sau',
+    'हज़ार': 'hazaar', 'हजार': 'hazaar', 'लाख': 'laakh', 'करोड़': 'crore',
+    'बाएँ': 'baayein', 'दाएँ': 'daayein', 'सीधे': 'seedhe', 'पीछे': 'peeche', 'आगे': 'aage',
+    'बजे': 'baje', 'बजा': 'baja', 'मिनट': 'minute', 'सेकंड': 'second', 'घंटा': 'ghanta', 'घंटे': 'ghante',
+    'हफ्ता': 'hafte', 'हफ्ते': 'hafte', 'महीना': 'mahina', 'महीने': 'mahine', 'साल': 'saal', 'वर्ष': 'varsh',
+    'कृपया': 'kripya', 'धन्यवाद': 'dhanyavaad', 'शुक्रिया': 'shukriya',
+    'नमस्ते': 'namaste', 'नमस्कार': 'namaskar', 'हैलो': 'hello', 'हाय': 'hi',
+    'अलविदा': 'alvida', 'बाय': 'bye',
+    'मदद': 'madad', 'सहायता': 'sahayata', 'जरूरत': 'zaroorat', 'चाहिए': 'chahiye',
+    'चाहता': 'chahta', 'चाहती': 'chahti',
+    'पसंद': 'pasand', 'नापसंद': 'napasand',
+    'खुश': 'khush', 'दुखी': 'dukhi', 'गुस्सा': 'gussa', 'परेशान': 'pareshan',
+    'माफ': 'maaf', 'माफी': 'maafi', 'क्षमा': 'kshama',
+    'सच': 'sach', 'झूठ': 'jhooth', 'सही': 'sahi', 'गलत': 'galat',
+    'आसान': 'aasaan', 'मुश्किल': 'mushkil', 'कठिन': 'kathin',
+    'जरूरी': 'zaroori', 'महत्वपूर्ण': 'mahatvapoorn',
+    'होशियार': 'hoshiyar', 'समझदार': 'samajhdaar', 'बुद्धिमान': 'buddhimaan',
+    'सुंदर': 'sundar', 'प्यारा': 'pyaara', 'प्यारी': 'pyaari'
+  };
+
+  const DEVANAGARI_PHRASES = [
+    ['कृपया', 'kripya'], ['धन्यवाद', 'dhanyavaad'], ['शुक्रिया', 'shukriya'],
+    ['नमस्ते', 'namaste'], ['नमस्कार', 'namaskar'], ['ठीक है', 'theek hai'],
+    ['मदद करो', 'madad karo'], ['माफ करो', 'maaf karo'], ['माफ़ करो', 'maaf karo'],
+    ['क्या हो रहा है', 'kya ho raha hai'], ['क्या कर रहे हो', 'kya kar rahe ho'],
+    ['क्या कर रही हो', 'kya kar rahi ho'], ['कैसे हो', 'kaise ho'],
+    ['कहाँ हो', 'kahan ho'], ['कहां हो', 'kahan ho']
+  ];
+
+  // Retained for legacy/local use (e.g. future contact matching).
+  // NOTE: This is intentionally NOT used for the AI backend query.
+  function transliterateDevanagariToHinglish(text) {
+    if (!text) return text;
+    var result = String(text);
+    for (var p = 0; p < DEVANAGARI_PHRASES.length; p++) {
+      result = result.split(DEVANAGARI_PHRASES[p][0]).join(' ' + DEVANAGARI_PHRASES[p][1] + ' ');
+    }
+    for (var hindiWord in DEVANAGARI_TO_HINGLISH) {
+      if (DEVANAGARI_TO_HINGLISH.hasOwnProperty(hindiWord)) {
+        result = result.split(hindiWord).join(' ' + DEVANAGARI_TO_HINGLISH[hindiWord] + ' ');
+      }
+    }
+    result = result.replace(/[\u0900-\u097F]+/g, ' ');
+    result = result.replace(/\s+/g, ' ').trim();
+    return result;
+  }
+
+  // ============================================================
+  // STATE MACHINE
+  // ============================================================
+  const STATE = { IDLE:'idle', LISTENING:'listening', THINKING:'thinking', SPEAKING:'speaking' };
+
+  let state = STATE.IDLE;
+  let recognition = null;
+  let isProcessing = false;
+  let currentUtterance = null;
+  let restartTimer = null;
+  let isRestartScheduled = false;
+  let isFirstActivation = true;
+  let conversationHistory = [];
+  let isStopped = false;
+  let isSpeakingNow = false;
+  let utteranceResolve = null;
+
+  const hasNative = (typeof window.ZishuAndroid !== 'undefined' && window.ZishuAndroid !== null);
+
+  let pendingNativeAction = null;
+
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+  const orbWrapper = document.getElementById('zishu-orb-wrapper');
+  const orbStatus = document.getElementById('zishu-orb-status');
+  const orbSub = document.getElementById('zishu-orb-sub');
+  const chatContainer = document.getElementById('zishu-chat-container');
+  const assistantStatus = document.getElementById('assistantStatus');
+  const assistantStatusText = document.getElementById('assistantStatusText');
+
+  const T = (key) => window.__getTranslation ? window.__getTranslation(key) : key;
+
+  // ============================================================
+  // WAKE WORDS
+  // ============================================================
+  const WAKE_WORDS = ['zishu', 'hey zishu', 'hi zishu', 'hello zishu', 'ok zishu'];
+  function isWakeWord(query) {
+    const q = query.toLowerCase().trim();
+    return WAKE_WORDS.some(function(word) { return q === word || q.includes(word); });
+  }
+
+  // ============================================================
+  // ORB STATE
+  // ============================================================
+  function setOrbState(newState) {
+    state = newState;
+    if (orbWrapper) orbWrapper.className = newState;
+
+    var statusMap = {
+      idle: [T('orb-status-idle'), T('orb-sub-idle')],
+      listening: ['Listening...', 'Speak now'],
+      thinking: ['Thinking...', 'Processing your request'],
+      speaking: ['Speaking...', 'Tap orb to stop']
+    };
+    var statuses = statusMap[newState] || statusMap.idle;
+    if (orbStatus) orbStatus.textContent = statuses[0];
+    if (orbSub) orbSub.textContent = statuses[1];
+
+    if (assistantStatus) assistantStatus.dataset.state = (newState === 'idle') ? 'ready' : newState;
+    if (assistantStatusText) {
+      assistantStatusText.textContent = ({
+        idle: T('status-ready'),
+        listening: T('status-listening'),
+        thinking: T('status-thinking'),
+        speaking: T('status-speaking')
+      })[newState] || T('status-ready');
+    }
+  }
+
+  // ============================================================
+  // CHAT HELPERS
+  // ============================================================
+  function addMessage(role, text) {
+    var div = document.createElement('div');
+    div.className = 'zishu-message ' + (role === 'user' ? 'zishu-user-msg' : 'zishu-assistant-msg');
+    var senderSpan = document.createElement('span');
+    senderSpan.className = 'zishu-sender';
+    senderSpan.textContent = (role === 'user') ? 'You' : 'Zishu';
+    var contentSpan = document.createElement('span');
+    contentSpan.className = 'zishu-content';
+    contentSpan.textContent = text;
+    div.appendChild(senderSpan);
+    div.appendChild(contentSpan);
+    chatContainer.appendChild(div);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    return div;
+  }
+
+  function addToolMessage(text) {
+    var div = document.createElement('div');
+    div.className = 'zishu-tool-msg';
+    div.textContent = text;
+    chatContainer.appendChild(div);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function addActionMessage(text) {
+    var div = document.createElement('div');
+    div.className = 'zishu-action-msg';
+    div.textContent = text;
+    chatContainer.appendChild(div);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  // ============================================================
+  // LOCAL ACTION HANDLERS
+  // ============================================================
+  function handleActions(query) {
+    var q = query.toLowerCase().trim();
+
+    if (q.includes('alarm') || q.includes('अलार्म') || q.includes('alarm lagao')) {
+      var timeMatch = q.match(/(\d{1,2})\s*(?:baje|:|\s*)(\d{0,2})?\s*(?:am|pm|सुबह|शाम|रात)?/i);
+      if (timeMatch) {
+        var hours = parseInt(timeMatch[1]);
+        var minutes = parseInt(timeMatch[2]) || 0;
+        if (q.includes('pm') || q.includes('शाम') || q.includes('रात')) { if (hours < 12) hours += 12; }
+        if (q.includes('am') || q.includes('सुबह')) { if (hours === 12) hours = 0; }
+        var alarmTime = new Date();
+        alarmTime.setHours(hours, minutes, 0, 0);
+        var now = new Date();
+        if (alarmTime < now) alarmTime.setDate(alarmTime.getDate() + 1);
+        var diff = alarmTime - now;
+        if (diff > 0) {
+          var alarms = JSON.parse(localStorage.getItem('zishu_alarms') || '[]');
+          alarms.push({ time: alarmTime.toISOString(), message: query, active: true });
+          localStorage.setItem('zishu_alarms', JSON.stringify(alarms));
+          return 'Alarm set for ' + alarmTime.toLocaleTimeString('hi-IN') + '. Main yaad dilaunga!';
+        }
+      }
+      return "Alarm ke liye time batao jaise 'alarm 7 baje' ya 'alarm 9:30 am'";
+    }
+
+    if (q.includes('remind') || q.includes('reminder') || q.includes('याद') || q.includes('याद दिलाओ')) {
+      var match = q.match(/(?:remind|याद दिलाओ|reminder)\s*(?:me|मुझे)?\s*(?:to|कि)?\s*(.+)/i);
+      if (match && match[1]) {
+        var reminders = JSON.parse(localStorage.getItem('zishu_reminders') || '[]');
+        reminders.push({ text: match[1].trim(), date: new Date().toISOString(), done: false });
+        localStorage.setItem('zishu_reminders', JSON.stringify(reminders));
+        return 'Reminder saved: "' + match[1].trim() + '". Main yaad dilaunga!';
+      }
+      return "Reminder ke liye batao jaise 'remind me to call mom' ya 'मुझे दवा लेनी है याद दिलाओ'";
+    }
+
+    if (q.includes('note') || q.includes('नोट') || q.includes('save') || q.includes('सेव') || q.includes('save note')) {
+      var match2 = q.match(/(?:note|नोट|save|सेव)\s*(?:this|यह)?\s*(.+)/i);
+      if (match2 && match2[1]) {
+        var notes = JSON.parse(localStorage.getItem('zishu_notes') || '[]');
+        notes.push({ text: match2[1].trim(), date: new Date().toISOString() });
+        localStorage.setItem('zishu_notes', JSON.stringify(notes));
+        return 'Note saved: "' + match2[1].trim() + '"';
+      }
+      return "Note ke liye batao jaise 'note shopping list' ya 'नोट आज बारिश हो रही है'";
+    }
+
+    if (q.includes('show notes') || q.includes('दिखाओ नोट') || q.includes('my notes')) {
+      var notes = JSON.parse(localStorage.getItem('zishu_notes') || '[]');
+      if (notes.length === 0) return "Koi note nahi hai. Pehle note save karo!";
+      var noteList = notes.map(function(n, i) { return (i + 1) + '. ' + n.text; }).join('\n');
+      return 'Aapke notes:\n' + noteList;
+    }
+
+    if (q.includes('show reminders') || q.includes('दिखाओ रिमाइंडर') || q.includes('my reminders')) {
+      var reminders = JSON.parse(localStorage.getItem('zishu_reminders') || '[]');
+      if (reminders.length === 0) return "Koi reminder nahi hai. Pehle reminder set karo!";
+      var remList = reminders.filter(function(r) { return !r.done; }).map(function(r, i) { return (i + 1) + '. ' + r.text; }).join('\n');
+      return 'Aapke reminders:\n' + remList;
+    }
+
+    return null;
+  }
+
+  function checkAlarms() {
+    var alarms = JSON.parse(localStorage.getItem('zishu_alarms') || '[]');
+    var now = new Date();
+    alarms.forEach(function(alarm) {
+      if (alarm.active) {
+        var alarmTime = new Date(alarm.time);
+        if (alarmTime <= now) {
+          alarm.active = false;
+          var msg = 'ALARM! ' + alarm.message;
+          addToolMessage('🔔 ' + msg);
+          if (!isProcessing) speakText('उठो! ' + alarm.message);
+          localStorage.setItem('zishu_alarms', JSON.stringify(alarms));
+        }
+      }
+    });
+  }
+  setInterval(checkAlarms, 30000);
+
+  var STOP_WORDS = [
+    'stop', 'ruko', 'bas', 'band karo', 'band kar', 'rok', 'rok do',
+    'बंद करो', 'बंद कर', 'रुको', 'बस', 'बस करो', 'रोको',
+    'enough', 'thats enough', 'bass', 'rokna', 'rok do',
+    'quit', 'cancel', 'shut up', 'chup', 'चुप'
+  ];
+
+  var SPECIAL_CHARS = {
+    '*': ' ', '_': ' ', '-': ' ', '•': ' ', '·': ' ',
+    '➡️': ' ', '👉': ' ', '✅': ' ', '⭐': ' ',
+    '🔹': ' ', '🔸': ' ', '▪️': ' ', '▫️': ' ',
+    '◆': ' ', '◇': ' ', '●': ' ', '○': ' ', '★': ' ', '☆': ' '
+  };
+
+  function cleanTextForSpeech(text) {
+    var cleaned = text;
+    for (var key in SPECIAL_CHARS) {
+      if (SPECIAL_CHARS.hasOwnProperty(key)) {
+        cleaned = cleaned.split(key).join(SPECIAL_CHARS[key]);
+      }
+    }
+    cleaned = cleaned.replace(/\s+/g, ' ');
+    cleaned = cleaned.replace(/\*\*/g, '');
+    cleaned = cleaned.replace(/\*/g, '');
+    cleaned = cleaned.replace(/\_\_/g, '');
+    cleaned = cleaned.replace(/\_/g, '');
+    cleaned = cleaned.replace(/\~\~/g, '');
+    cleaned = cleaned.replace(/\~/g, '');
+    cleaned = cleaned.replace(/^#+\s*/gm, '');
+    cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+    cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
+    cleaned = cleaned.replace(/`[^`]*`/g, '');
+    cleaned = cleaned.replace(/^\s*[-*+]\s+/gm, '');
+    cleaned = cleaned.replace(/^\s*\d+\.\s+/gm, '');
+    cleaned = cleaned.replace(/\s+/g, ' ').trim();
+    return cleaned;
+  }
+
+  var SITE_ALIASES = {
+    youtube:['youtube','you tube','यूट्यूब','यू ट्यूब'], instagram:['instagram','insta','इंस्टाग्राम','इंस्टा'],
+    facebook:['facebook','fb','फेसबुक','फेसबुक'], twitter:['twitter','x','ट्विटर','ट्विटर'],
+    whatsapp:['whatsapp','whats app','व्हाट्सएप','व्हाट्सऐप'], telegram:['telegram','टेलीग्राम','टेलीग्राम'],
+    snapchat:['snapchat','स्नैपचैट','स्नैपचैट'], pinterest:['pinterest','पिनट्रेस्ट','पिनट्रेस्ट'],
+    tumblr:['tumblr','टम्बलर','टम्बलर'], linkedin:['linkedin','linkdin','लिंक्डइन','लिंक्डइन'],
+    reddit:['reddit','रेडिट','रेडिट'], discord:['discord','डिस्कॉर्ड','डिस्कॉर्ड'],
+    tiktok:['tiktok','टिकटॉक','टिकटोक'], threads:['threads','थ्रेड्स','थ्रेड्स'],
+    bluesky:['bluesky','ब्लूस्काई','ब्लूस्काई'], mastodon:['mastodon','मास्टोडन','मास्टोडन'],
+    google:['google','गूगल','गूगल'], gmail:['gmail','जीमेल','जी मेल'],
+    maps:['google maps','maps','गूगल मैप्स','मैप्स','map'], drive:['google drive','drive','गूगल ड्राइव','ड्राइव'],
+    docs:['google docs','docs','गूगल डॉक्स','डॉक्स'], sheets:['google sheets','sheets','गूगल शीट्स','शीट्स'],
+    slides:['google slides','slides','गूगल स्लाइड्स','स्लाइड्स'], translate:['google translate','translate','गूगल ट्रांसलेट','ट्रांसलेट'],
+    calendar:['google calendar','calendar','गूगल कैलेंडर','कैलेंडर'], photos:['google photos','photos','गूगल फोटो','फोटो'],
+    keep:['google keep','keep','गूगल कीप','कीप'], tasks:['google tasks','tasks','गूगल टास्क','टास्क'],
+    meet:['google meet','meet','गूगल मीट','मीट'], netflix:['netflix','नेटफ्लिक्स','नेटफ्लिक्स'],
+    spotify:['spotify','स्पॉटिफाई','स्पॉटिफाई','स्पॉटिफाय'], primevideo:['prime video','amazon prime','prime','प्राइम वीडियो','प्राइम'],
+    hotstar:['hotstar','हॉटस्टार','हॉटस्टार'], sonyliv:['sony liv','sonyliv','सोनी लिव','सोनी'],
+    voot:['voot','वूट','वूट'], zee5:['zee5','z5','ज़ी5','ज़ी'],
+    mxplayer:['mx player','mx','एमएक्स प्लेयर','एमएक्स'], jiosaavn:['jiosaavn','saavn','जियोसावन','सावन'],
+    wynk:['wynk','विन्क','विन्क'], gaana:['gaana','गाना','गाना'],
+    hungama:['hungama','हंगामा','हंगामा'], apple:['apple music','apple','एप्पल म्यूजिक','एप्पल'],
+    soundcloud:['soundcloud','साउंडक्लाउड','साउंडक्लाउड'], tidal:['tidal','टाइडल','टाइडल'],
+    amazon:['amazon','अमेज़न','अमेजन','अमेज़न'], flipkart:['flipkart','फ्लिपकार्ट','फ्लिपकार्ट'],
+    myntra:['myntra','मिंत्रा','मिंत्रा'], ajio:['ajio','अजियो','अजियो'],
+    nykaa:['nykaa','नायका','नायका'], meesho:['meesho','मीशो','मीशो'],
+    snapdeal:['snapdeal','स्नैपडील','स्नैपडील'], paytm:['paytm','पेटीएम','पेटीएम'],
+    phonepe:['phonepe','फोनपे','फोनपे'], gpay:['google pay','gpay','गूगल पे','गूगलपे'],
+    croma:['croma','क्रोमा','क्रोमा'], reliance:['reliance digital','reliance','रिलायंस','रिलायंस डिजिटल'],
+    tata:['tata cliq','tata','ताता क्लिक','ताता'], shopclues:['shopclues','शॉपक्लूज़','शॉपक्लूज़'],
+    zomato:['zomato','जोमैटो','जोमैटो'], swiggy:['swiggy','स्विगी','स्विगी'],
+    dominos:['dominos','डोमिनोस','डोमिनोज़'], pizza:['pizza hut','पिज़्ज़ा','पिज्जा हट'],
+    kfc:['kfc','केएफसी','केएफसी'], mcdonalds:['mcdonalds','macdonald','मैकडोनाल्ड','मैक्डोनाल्ड'],
+    burgerking:['burger king','बर्गर किंग','बर्गर किंग'], subway:['subway','सबवे','सबवे'],
+    starbucks:['starbucks','स्टारबक्स','स्टारबक्स'], uber:['uber','उबर','उबर'],
+    ola:['ola','ओला','ओला'], timesofindia:['times of india','toi','टाइम्स ऑफ इंडिया','टाइम्स'],
+    hindustantimes:['hindustan times','हिंदुस्तान टाइम्स','हिंदुस्तान'], ndtv:['ndtv','एनडीटीवी','एनडीटीवी'],
+    bbc:['bbc','बीबीसी','बीबीसी'], cnn:['cnn','सीएनएन','सीएनएन'],
+    thehindu:['the hindu','हिन्दू','द हिन्दू'], indianexpress:['indian express','इंडियन एक्सप्रेस','इंडियन एक्सप्रेस'],
+    livemint:['livemint','लाइवमिंट','लाइवमिंट'], moneycontrol:['moneycontrol','मनीकंट्रोल','मनीकंट्रोल'],
+    bloomberg:['bloomberg','ब्लूमबर्ग','ब्लूमबर्ग'], reuters:['reuters','रॉयटर्स','रॉयटर्स'],
+    github:['github','git hub','गिटहब','गिट हब'], stackoverflow:['stack overflow','stackoverflow','स्टैक ओवरफ्लो','स्टैक'],
+    codepen:['codepen','कोडपेन','कोडपेन'], devto:['dev.to','devto','डेव','डेव टू'],
+    producthunt:['product hunt','producthunt','प्रोडक्ट हंट','हंट'], gitlab:['gitlab','गिटलैब','गिटलैब'],
+    bitbucket:['bitbucket','बिटबकेट','बिटबकेट'], docker:['docker','डॉकर','डॉकर'],
+    kubernetes:['kubernetes','k8s','कुबेरनेट्स','कुबेरनेट्स'], aws:['aws','amazon web services','एडब्ल्यूएस','एमज़ॉन वेब सर्विस'],
+    azure:['azure','microsoft azure','एज़्योर','माइक्रोसॉफ्ट एज़्योर'], googlecloud:['google cloud','gcp','गूगल क्लाउड','जीसीपी'],
+    chatgpt:['chatgpt','chat gpt','चैटजीपीटी','चैट जीपीटी'], bard:['bard','google bard','बार्ड','गूगल बार्ड'],
+    claude:['claude','क्लॉड','क्लॉड'], perplexity:['perplexity','परप्लेक्सिटी','परप्लेक्सिटी'],
+    midjourney:['midjourney','मिडजर्नी','मिडजर्नी'], dalle:['dalle','dall-e','डाली','डाल-ई'],
+    stable:['stable diffusion','स्टेबल डिफ्यूजन','स्टेबल डिफ्यूजन'], huggingface:['hugging face','huggingface','हगिंग फेस','हगिंगफेस'],
+    replicate:['replicate','रिप्लिकेट','रिप्लिकेट'], wikipedia:['wikipedia','विकिपीडिया','विकिपीडिया'],
+    khanacademy:['khan academy','khanacademy','खान अकादमी','खान'], coursera:['coursera','कोर्सेरा','कोर्सेरा'],
+    udemy:['udemy','यूडेमी','यूडेमी'], byjus:['byjus','बायजू','बायजू'],
+    unacademy:['unacademy','यूनाकेडमी','यूनाकेडमी'], vedantu:['vedantu','वेदांतु','वेदांतु'],
+    duolingo:['duolingo','डुओलिंगो','डुओलिंगो'], britannica:['britannica','ब्रिटैनिका','ब्रिटैनिका'],
+    mit:['mit','एमआईटी','एमआईटी'], stanford:['stanford','स्टैनफोर्ड','स्टैनफोर्ड'],
+    chess:['chess','शतरंज','शतरंज'], ludo:['ludo','लूडो','लूडो'],
+    carrom:['carrom','कैरम','कैरम'], pubg:['pubg','पबजी','पबजी'],
+    freefire:['free fire','freefire','फ्री फायर','फ्रीफायर'], minecraft:['minecraft','माइनक्राफ्ट','माइनक्राफ्ट'],
+    clashofclans:['clash of clans','coc','क्लैश ऑफ क्लैंस','क्लैश'], valorant:['valorant','वैलोरेंट','वैलोरेंट'],
+    fortnite:['fortnite','फोर्टनाइट','फोर्टनाइट'], apex:['apex legends','apex','एपेक्स लीजेंड्स','एपेक्स'],
+    cod:['call of duty','cod','कॉल ऑफ ड्यूटी','कॉल ऑफ ड्यूटी'], gta:['gta','grand theft auto','जीटीए','ग्रैंड थेफ्ट ऑटो'],
+    roblox:['roblox','रोब्लॉक्स','रोब्लॉक्स'], amongus:['among us','अमंग अस','अमंग अस'],
+    candycrush:['candy crush','कैंडी क्रश','कैंडी क्रश'], temple:['temple run','टेंपल रन','टेंपल रन'],
+    duckduckgo:['duckduckgo','duck duck go','डकडकगो','डक डक गो'], medium:['medium','मीडियम','मीडियम'],
+    quora:['quora','कोरा','कोरा'], canva:['canva','कैनवा','कैनवा'],
+    figma:['figma','फिग्मा','फिग्मा'], notion:['notion','नोशन','नोशन'],
+    slack:['slack','स्लैक','स्लैक'], zoom:['zoom','ज़ूम','ज़ूम'],
+    teams:['microsoft teams','teams','माइक्रोसॉफ्ट टीम्स','टीम्स'], trello:['trello','ट्रेलो','ट्रेलो'],
+    asana:['asana','असाना','असाना'], jira:['jira','जिरा','जिरा'],
+    confluence:['confluence','कॉन्फ्लुएंस','कॉन्फ्लुएंस'], airtable:['airtable','एयरटेबल','एयरटेबल'],
+    webflow:['webflow','वेबफ्लो','वेबफ्लो'], wix:['wix','विक्स','विक्स'],
+    squarespace:['squarespace','स्क्वेयरस्पेस','स्क्वेयरस्पेस'], shopify:['shopify','शॉपिफाई','शॉपिफाई'],
+    wordpress:['wordpress','वर्डप्रेस','वर्डप्रेस'], godaddy:['godaddy','गोडैडी','गोडैडी'],
+    namecheap:['namecheap','नेमचीप','नेमचीप']
+  };
+
+  var WEBSITE_MAP = {
+    youtube:'https://youtube.com', instagram:'https://instagram.com', facebook:'https://facebook.com',
+    twitter:'https://twitter.com', whatsapp:'https://web.whatsapp.com', telegram:'https://web.telegram.org',
+    snapchat:'https://snapchat.com', pinterest:'https://pinterest.com', tumblr:'https://tumblr.com',
+    linkedin:'https://linkedin.com', reddit:'https://reddit.com', discord:'https://discord.com',
+    tiktok:'https://tiktok.com', threads:'https://threads.net', bluesky:'https://bsky.app',
+    mastodon:'https://mastodon.social', google:'https://google.com', gmail:'https://gmail.com',
+    maps:'https://maps.google.com', drive:'https://drive.google.com', docs:'https://docs.google.com',
+    sheets:'https://sheets.google.com', slides:'https://slides.google.com', translate:'https://translate.google.com',
+    calendar:'https://calendar.google.com', photos:'https://photos.google.com', keep:'https://keep.google.com',
+    tasks:'https://tasks.google.com', meet:'https://meet.google.com', netflix:'https://netflix.com',
+    spotify:'https://spotify.com', primevideo:'https://primevideo.com', hotstar:'https://hotstar.com',
+    sonyliv:'https://sonyliv.com', voot:'https://voot.com', zee5:'https://zee5.com',
+    mxplayer:'https://mxplayer.com', jiosaavn:'https://jiosaavn.com', wynk:'https://wynk.in',
+    gaana:'https://gaana.com', hungama:'https://hungama.com', apple:'https://music.apple.com',
+    soundcloud:'https://soundcloud.com', tidal:'https://tidal.com', amazon:'https://amazon.in',
+    flipkart:'https://flipkart.com', myntra:'https://myntra.com', ajio:'https://ajio.com',
+    nykaa:'https://nykaa.com', meesho:'https://meesho.com', snapdeal:'https://snapdeal.com',
+    paytm:'https://paytm.com', phonepe:'https://phonepe.com', gpay:'https://pay.google.com',
+    croma:'https://croma.com', reliance:'https://reliance.com', tata:'https://tatacliq.com',
+    shopclues:'https://shopclues.com', zomato:'https://zomato.com', swiggy:'https://swiggy.com',
+    dominos:'https://dominos.in', pizza:'https://pizzahut.in', kfc:'https://kfc.co.in',
+    mcdonalds:'https://mcdonalds.com', burgerking:'https://burgerking.in', subway:'https://subway.com',
+    starbucks:'https://starbucks.in', uber:'https://uber.com', ola:'https://ola.com',
+    timesofindia:'https://timesofindia.com', hindustantimes:'https://hindustantimes.com', ndtv:'https://ndtv.com',
+    bbc:'https://bbc.com', cnn:'https://cnn.com', thehindu:'https://thehindu.com',
+    indianexpress:'https://indianexpress.com', livemint:'https://livemint.com', moneycontrol:'https://moneycontrol.com',
+    bloomberg:'https://bloomberg.com', reuters:'https://reuters.com', github:'https://github.com',
+    stackoverflow:'https://stackoverflow.com', codepen:'https://codepen.io', devto:'https://dev.to',
+    producthunt:'https://producthunt.com', gitlab:'https://gitlab.com', bitbucket:'https://bitbucket.org',
+    docker:'https://docker.com', kubernetes:'https://kubernetes.io', aws:'https://aws.amazon.com',
+    azure:'https://azure.microsoft.com', googlecloud:'https://cloud.google.com', chatgpt:'https://chatgpt.com',
+    bard:'https://bard.google.com', claude:'https://claude.ai', perplexity:'https://perplexity.ai',
+    midjourney:'https://midjourney.com', dalle:'https://openai.com/dall-e', stable:'https://stablediffusionweb.com',
+    huggingface:'https://huggingface.co', replicate:'https://replicate.com', wikipedia:'https://wikipedia.org',
+    khanacademy:'https://khanacademy.org', coursera:'https://coursera.org', udemy:'https://udemy.com',
+    byjus:'https://byjus.com', unacademy:'https://unacademy.com', vedantu:'https://vedantu.com',
+    duolingo:'https://duolingo.com', britannica:'https://britannica.com', mit:'https://mit.edu',
+    stanford:'https://stanford.edu', chess:'https://chess.com', ludo:'https://ludo.king.com',
+    carrom:'https://carrom.com', pubg:'https://pubg.com', freefire:'https://freefire.com',
+    minecraft:'https://minecraft.net', clashofclans:'https://clashofclans.com', valorant:'https://valorant.com',
+    fortnite:'https://fortnite.com', apex:'https://apexlegends.com', cod:'https://callofduty.com',
+    gta:'https://rockstargames.com', roblox:'https://roblox.com', amongus:'https://amongus.com',
+    candycrush:'https://candycrush.com', temple:'https://templerun.com', duckduckgo:'https://duckduckgo.com',
+    medium:'https://medium.com', quora:'https://quora.com', canva:'https://canva.com',
+    figma:'https://figma.com', notion:'https://notion.so', slack:'https://slack.com',
+    zoom:'https://zoom.us', teams:'https://teams.microsoft.com', trello:'https://trello.com',
+    asana:'https://asana.com', jira:'https://jira.com', confluence:'https://atlassian.com/software/confluence',
+    airtable:'https://airtable.com', webflow:'https://webflow.com', wix:'https://wix.com',
+    squarespace:'https://squarespace.com', shopify:'https://shopify.com', wordpress:'https://wordpress.com',
+    godaddy:'https://godaddy.com', namecheap:'https://namecheap.com'
+  };
+
+  function getLocalAnswer(query) {
+    var q = query.toLowerCase().trim();
+
+    if (q.includes('tumhe kisne banaya') || q.includes('tum kisne banaya') || q.includes('tumhari creator') || q.includes('tumhara maker') || q.includes('who created you') || q.includes('who made you')) {
+      return "Mujhe Zishan ne banaya hai. Zishan ek talented developer hain aur unka vision hai ki AI ko sabke liye accessible banana.";
+    }
+    if ((q.includes('zishan') && (q.includes('kaun') || q.includes('who') || q.includes('about') || q.includes('कौन'))) || q.includes('zishan kaun hai')) {
+      return "Zishan Zishu Tron ke founder hain. Wo ek passionate developer hain jo AI aur technology mein deep interest rakhte hain. Unka maqsad hai ki AI ko simple aur useful banana.";
+    }
+    if (q.includes('zishu tron') || q.includes('zishutron') || (q.includes('tron') && q.includes('about'))) {
+      return "Zishu Tron ek creative technology brand hai jo Zishu ke peeche hai. Brand ka focus modern digital products banane aur naye tareekon se technology ko accessible aur useful banana hai. Zishan is brand ke founder aur developer hain.";
+    }
+    if (q.includes('date') || q.includes('today') || q.includes('aaj') || q.includes('तारीख') || q.includes('date kya hai') || q.includes('aaj ka')) {
+      var now = new Date();
+      var options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return 'Aaj ki tareekh ' + now.toLocaleDateString('hi-IN', options) + ' hai.';
+    }
+    if (q.includes('time') || q.includes('samay') || q.includes('समय') || q.includes('kya time') || q.includes('time kya hai')) {
+      var now2 = new Date();
+      var hours = String(now2.getHours()).padStart(2, '0');
+      var minutes = String(now2.getMinutes()).padStart(2, '0');
+      return 'Abhi ' + hours + ':' + minutes + ' baj rahe hain.';
+    }
+    if (q.includes('tum kaun ho') || q.includes('who are you') || q.includes('तुम कौन हो') || q.includes('tum kya ho') || q.includes('what are you')) {
+      return "Main Zishu AI hoon - ek voice assistant jo Zishan ne banaya hai. Main Zishu Tron ka AI project hoon. Main Hindi aur English dono mein baat kar sakta hoon aur 200+ websites bhi open kar sakta hoon!";
+    }
+    return null;
+  }
+
+  function detectLocalCommand(query) {
+    var q = query.toLowerCase().trim();
+    var openWords = [
+      'open','open karo','open kar','kholo','khol','khol do','khol de',
+      'chalao','chala do','start','launch',
+      'खोलो','खोल','खोल दो','खोल दे','खोलना','चलाओ','चला दो',
+      'शुरू करो','शुरू कर','op','opn','ओपन','ओपन करो','ओपन कर'
+    ];
+    for (var site in SITE_ALIASES) {
+      if (SITE_ALIASES.hasOwnProperty(site)) {
+        var aliases = SITE_ALIASES[site];
+        var siteFound = aliases.some(function(alias) { return q.includes(alias); });
+        if (!siteFound) continue;
+        var wantsOpen = openWords.some(function(word) { return q.includes(word); }) ||
+          aliases.some(function(alias) { return q === alias; }) ||
+          q === site || q === 'open ' + site || q === 'ओपन ' + site;
+        if (wantsOpen) return { type: 'open_website', value: site };
+      }
+    }
+    return null;
+  }
+
+  function openWebsiteDirectly(siteName) {
+    var url = WEBSITE_MAP[siteName];
+    if (!url) { addToolMessage('Website not found: ' + siteName); return false; }
+    addToolMessage('Opening ' + siteName + '...');
+
+    if (hasNative && typeof window.ZishuAndroid.searchWeb === 'function') {
+      try { window.ZishuAndroid.searchWeb(url); return true; } catch (e) {}
+    }
+    try { window.location.assign(url); return true; }
+    catch (e) {
+      try { window.location.href = url; return true; }
+      catch (e2) {
+        try {
+          var a = document.createElement('a');
+          a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          document.body.appendChild(a); a.click(); a.remove(); return true;
+        } catch (e3) { addToolMessage('Could not open ' + siteName); return false; }
+      }
+    }
+  }
+
+  // ============================================================
+  // NATIVE BRIDGE SAFE WRAPPER
+  // ============================================================
+  function safeNative(method, ...args) {
+    if (!hasNative) return null;
+    try {
+      if (typeof window.ZishuAndroid[method] === 'function') {
+        return window.ZishuAndroid[method](...args);
+      }
+    } catch (e) { console.warn('[Zishu Native]', method, 'error:', e); }
+    return null;
+  }
+
+  // ============================================================
+  // ORB CLICK
+  // ============================================================
+  if (orbWrapper) {
+    orbWrapper.addEventListener('click', function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (isSpeakingNow || state === STATE.SPEAKING || isProcessing) {
+        stopCurrentResponse();
+        return;
+      }
+      toggleListening();
+    });
+  }
+
+  function toggleListening() {
+    if (isProcessing) { if (orbSub) orbSub.textContent = 'Please wait...'; return; }
+    if (state === STATE.IDLE || state === STATE.SPEAKING) startListening();
+    else if (state === STATE.LISTENING) { stopListening(); setOrbState(STATE.IDLE); }
+  }
+
+  function stopCurrentResponse() {
+    isStopped = true;
+    isSpeakingNow = false;
+
+    if (hasNative) safeNative('stopSpeaking');
+
+    try {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if (currentUtterance) currentUtterance = null;
+    } catch (e) {}
+
+    if (utteranceResolve) { utteranceResolve(); utteranceResolve = null; }
+    isProcessing = false;
+
+    var stopDiv = document.createElement('div');
+    stopDiv.className = 'zishu-stop-msg';
+    stopDiv.textContent = 'Stopped. Listening again...';
+    chatContainer.appendChild(stopDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    setOrbState(STATE.IDLE);
+
+    setTimeout(function() {
+      isStopped = false;
+      if (state === STATE.IDLE) startListening();
+    }, 400);
+  }
+
+  function isStopCommand(query) {
+    var q = query.toLowerCase().trim();
+    return STOP_WORDS.some(function(word) {
+      if (q === word) return true;
+      if (q.includes(word)) return true;
+      if (word.includes(q) && q.length > 2) return true;
+      return false;
+    });
+  }
+
+  // ============================================================
+  // SPEECH RECOGNITION
+  // ============================================================
+  function initSpeechRecognition() {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { if (orbStatus) orbStatus.textContent = 'Browser not supported'; return null; }
+
+    var rec = new SR();
+    rec.lang = 'hi-IN';
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = function() {
+      clearRestartTimer();
+      setOrbState(STATE.LISTENING);
+      if (isFirstActivation) { isFirstActivation = false; if (orbSub) orbSub.textContent = 'Listening...'; }
+    };
+
+    rec.onresult = function(event) {
+      var transcript = event.results[0][0].transcript.trim();
+      if (transcript.length > 0) {
+        if (isWakeWord(transcript) && state === STATE.IDLE) {
+          if (!isProcessing) {
+            stopListening();
+            setTimeout(function() { startListening(); }, 200);
+            addToolMessage('"Zishu" sun liya! Ab bolen...');
+            return;
+          }
+        }
+        if (isStopCommand(transcript)) {
+          if (isSpeakingNow || isProcessing || state === STATE.SPEAKING) { stopCurrentResponse(); return; }
+        }
+        stopListening();
+        handleUserQuery(transcript);
+      }
+    };
+
+    rec.onerror = function(event) {
+      if (event.error === 'not-allowed') {
+        if (orbStatus) orbStatus.textContent = 'Microphone access denied';
+        if (orbSub) orbSub.textContent = 'Please allow microphone access';
+        setOrbState(STATE.IDLE);
+      } else if (event.error === 'no-speech') {
+        if (orbSub) orbSub.textContent = 'No speech detected. Try again.';
+        scheduleRestart(800);
+      } else {
+        if (orbSub) orbSub.textContent = 'Error: ' + event.error;
+        scheduleRestart(1000);
+      }
+    };
+
+    rec.onend = function() {
+      if (state === STATE.LISTENING && !isProcessing && !isRestartScheduled) scheduleRestart(300);
+      else if (!isProcessing && state !== STATE.SPEAKING) setOrbState(STATE.IDLE);
+    };
+
+    return rec;
+  }
+
+  function startListening() {
+    clearRestartTimer();
+
+    if (hasNative) {
+      console.log('[Zishu Native] Starting native listening');
+      safeNative('startListening');
+      setOrbState(STATE.LISTENING);
+      return;
+    }
+
+    if (!recognition) {
+      recognition = initSpeechRecognition();
+      if (!recognition) return;
+    }
+    try { recognition.start(); setOrbState(STATE.LISTENING); } catch (e) { setOrbState(STATE.IDLE); }
+  }
+
+  function stopListening() {
+    clearRestartTimer();
+    if (hasNative) {
+      safeNative('stopListening');
+      if (!isProcessing) setOrbState(STATE.IDLE);
+      return;
+    }
+    if (recognition) { try { recognition.stop(); } catch (e) {} }
+    if (!isProcessing) setOrbState(STATE.IDLE);
+  }
+
+  function scheduleRestart(delay) {
+    clearRestartTimer();
+    isRestartScheduled = true;
+    restartTimer = setTimeout(function() {
+      isRestartScheduled = false;
+      if (state === STATE.IDLE || state === STATE.LISTENING) startListening();
+    }, delay);
+  }
+
+  function clearRestartTimer() {
+    isRestartScheduled = false;
+    if (restartTimer) { clearTimeout(restartTimer); restartTimer = null; }
+  }
+
+  // ============================================================
+  // SPEAK (TTS)
+  // ============================================================
+  function speakText(text) {
+    var cleanText = cleanTextForSpeech(text);
+    if (isStopped) return Promise.resolve();
+    if (!cleanText || cleanText.trim().length === 0) {
+      if (!isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+      return Promise.resolve();
+    }
+
+    return new Promise(function(resolve) {
+      if (hasNative) {
+        console.log('[Zishu Native] Using native TTS');
+        utteranceResolve = resolve;
+        isSpeakingNow = true;
+        setOrbState(STATE.SPEAKING);
+        try { safeNative('speak', cleanText); }
+        catch (e) {
+          console.error('[Zishu Native] TTS error:', e);
+          isSpeakingNow = false;
+          if (!isStopped && !isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+          resolve();
+        }
+        return;
+      }
+
+      try {
+        if (!window.speechSynthesis) { resolve(); return; }
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+
+        var voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) {
+          var voiceTimeout = setTimeout(function() {
+            if (!isStopped) proceedWithSpeech(); else resolve();
+          }, 2000);
+          window.speechSynthesis.onvoiceschanged = function() {
+            clearTimeout(voiceTimeout);
+            if (!isStopped) proceedWithSpeech(); else resolve();
+          };
+          return;
+        }
+        proceedWithSpeech();
+
+        function proceedWithSpeech() {
+          if (isStopped) { resolve(); return; }
+          var utterance = new SpeechSynthesisUtterance(cleanText);
+          utterance.lang = 'hi-IN';
+          utterance.rate = 0.95;
+          utterance.pitch = 1.05;
+          utterance.volume = 1;
+
+          try {
+            var allVoices = window.speechSynthesis.getVoices();
+            var femaleHindi = allVoices.filter(function(v) {
+              return v.lang.startsWith('hi') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('swara') || v.name.toLowerCase().includes('lekh') || v.name.toLowerCase().includes('google'));
+            });
+            if (femaleHindi.length > 0) utterance.voice = femaleHindi[0];
+            else { var anyHindi = allVoices.find(function(v) { return v.lang.startsWith('hi'); }); if (anyHindi) utterance.voice = anyHindi; }
+          } catch (e) {}
+
+          var isEnded = false;
+          var safetyTimer = null;
+
+          utterance.onstart = function() {
+            isSpeakingNow = true;
+            if (!isStopped) setOrbState(STATE.SPEAKING);
+            safetyTimer = setTimeout(function() {
+              if (!isEnded && !isStopped) { /* safety */ }
+            }, Math.max(cleanText.length * 40 + 5000, 8000));
+          };
+          utterance.onend = function() {
+            if (!isEnded) {
+              isEnded = true; isSpeakingNow = false; currentUtterance = null;
+              if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
+              if (!isStopped && !isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+              resolve();
+            }
+          };
+          utterance.onerror = function() {
+            if (!isEnded) {
+              isEnded = true; isSpeakingNow = false; currentUtterance = null;
+              if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
+              if (!isStopped && !isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+              resolve();
+            }
+          };
+
+          currentUtterance = utterance;
+          utteranceResolve = resolve;
+          try { window.speechSynthesis.speak(utterance); }
+          catch (e) {
+            isSpeakingNow = false;
+            if (!isStopped && !isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+            resolve();
+          }
+        }
+      } catch (error) {
+        isSpeakingNow = false;
+        if (!isStopped && !isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+        resolve();
+      }
+    });
+  }
+
+  function forceLoadVoices() {
+    if (hasNative) return;
+    if (!window.speechSynthesis) return;
+    try {
+      var attempts = 0, maxAttempts = 5;
+      function tryLoadVoices() {
+        attempts++;
+        var voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) return true;
+        if (attempts < maxAttempts) setTimeout(tryLoadVoices, 500 * attempts);
+        return false;
+      }
+      tryLoadVoices();
+      window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+    } catch (e) {}
+  }
+
+  function streamResponse(text) {
+    if (isStopped) return null;
+    setOrbState(STATE.SPEAKING);
+
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'zishu-message zishu-assistant-msg';
+    var senderSpan = document.createElement('span');
+    senderSpan.className = 'zishu-sender';
+    senderSpan.textContent = 'Zishu';
+    var contentSpan = document.createElement('span');
+    contentSpan.className = 'zishu-content';
+    msgDiv.appendChild(senderSpan);
+    msgDiv.appendChild(contentSpan);
+    chatContainer.appendChild(msgDiv);
+
+    var accumulatedText = '';
+    var chunkSize = 3, index = 0;
+
+    function streamNextChunk() {
+      if (isStopped) { contentSpan.textContent = accumulatedText + '... [stopped]'; return; }
+      if (index >= text.length) {
+        if (!isStopped) setTimeout(function() { if (!isStopped) speakText(text); }, 300);
+        return;
+      }
+      var chunk = text.substring(index, Math.min(index + chunkSize, text.length));
+      accumulatedText += chunk;
+      contentSpan.textContent = accumulatedText;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      index += chunkSize;
+      requestAnimationFrame(function() { setTimeout(streamNextChunk, 15); });
+    }
+    streamNextChunk();
+    return msgDiv;
+  }
+
+  // ============================================================
+  // CONFIRMATION
+  // ============================================================
+  function isConfirmationYes(query) {
+    var q = query.toLowerCase().trim();
+    var yes = ['yes','haan','han','ha','हाँ','हां','ok','okay','confirm','kar do','call karo','send it','send karo','bhej do','karo'];
+    return yes.some(function(w) { return q === w || q.includes(w); });
+  }
+  function isConfirmationNo(query) {
+    var q = query.toLowerCase().trim();
+    var no = ['no','nahi','नहीं','cancel','mat karo','band karo','ruk jao','rehne do','chhodo'];
+    return no.some(function(w) { return q === w || q.includes(w); });
+  }
+
+  function executePendingAction() {
+    if (!pendingNativeAction) return;
+    var action = pendingNativeAction;
+    pendingNativeAction = null;
+    console.log('[Zishu Native] Executing confirmed action:', action.type);
+
+    if (action.type === 'make_call') {
+      if (hasNative) {
+        var r = safeNative('makeCall', action.data.phoneNumber);
+        if (r === null) {
+          var msg = 'Call feature available nahi hai.';
+          addActionMessage(msg); speakText(msg);
+        } else {
+          var okMsg = 'Call kar rahi hoon ' + action.data.phoneNumber + ' par.';
+          addActionMessage(okMsg); speakText(okMsg);
+        }
+      } else {
+        var msg2 = 'Native call support is not available in this browser.';
+        addActionMessage(msg2); speakText(msg2);
+      }
+    } else if (action.type === 'send_sms') {
+      if (hasNative) {
+        var r2 = safeNative('sendSms', action.data.phoneNumber, action.data.message);
+        if (r2 === null) {
+          var msg3 = 'SMS feature available nahi hai.';
+          addActionMessage(msg3); speakText(msg3);
+        } else {
+          var okMsg2 = 'SMS bhej rahi hoon.';
+          addActionMessage(okMsg2); speakText(okMsg2);
+        }
+      } else {
+        var msg4 = 'Native SMS support is not available in this browser.';
+        addActionMessage(msg4); speakText(msg4);
+      }
+    } else if (action.type === 'send_sms_contact') {
+      if (hasNative) {
+        var r3 = safeNative('sendSmsToContact', action.data.contactName, action.data.message);
+        if (r3 === null) {
+          var msg5 = 'SMS feature available nahi hai.';
+          addActionMessage(msg5); speakText(msg5);
+        } else {
+          var okMsg3 = action.data.contactName + ' ko SMS bhej rahi hoon.';
+          addActionMessage(okMsg3); speakText(okMsg3);
+        }
+      } else {
+        var msg6 = 'Native SMS support is not available in this browser.';
+        addActionMessage(msg6); speakText(msg6);
+      }
+    }
+
+    isProcessing = false;
+    if (!isStopped) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+  }
+
+  function cancelPendingAction() {
+    if (!pendingNativeAction) return;
+    pendingNativeAction = null;
+    var msg = 'Theek hai, cancel kar diya.';
+    addActionMessage(msg); speakText(msg);
+    isProcessing = false;
+    setOrbState(STATE.IDLE);
+    scheduleRestart(1000);
+  }
+
+  // ============================================================
+  // NATIVE COMMAND DETECTION
+  // ============================================================
+  function detectNativeCommand(query) {
+    var q = query.toLowerCase().trim();
+
+    // ---------- OPEN APP ----------
+    var openWords = ['open','kholo','khol','khol do','khol de','open karo','open kar','chalao','chala do',
+      'launch','start','खोलो','खोल','खोल दो','खोल दे','चलाओ','चला दो','शुरू करो','शुरू कर','ओपन','ओपन करो'];
+
+    var appAliases = {
+      'whatsapp':'WhatsApp','whats app':'WhatsApp','व्हाट्सएप':'WhatsApp','व्हाट्सऐप':'WhatsApp','वाट्सएप':'WhatsApp',
+      'youtube':'YouTube','you tube':'YouTube','यूट्यूब':'YouTube','यूटुब':'YouTube',
+      'instagram':'Instagram','insta':'Instagram','इंस्टाग्राम':'Instagram','इंस्टा':'Instagram',
+      'facebook':'Facebook','fb':'Facebook','फेसबुक':'Facebook',
+      'telegram':'Telegram','टेलीग्राम':'Telegram',
+      'gmail':'Gmail','जीमेल':'Gmail',
+      'chrome':'Chrome','क्रोम':'Chrome','google chrome':'Chrome','गूगल क्रोम':'Chrome',
+      'maps':'Maps','google maps':'Maps','गूगल मैप':'Maps','गूगल मैप्स':'Maps',
+      'settings':'Settings','setting':'Settings','सेटिंग':'Settings','सेटिंग्स':'Settings',
+      'camera':'Camera','कैमरा':'Camera',
+      'gallery':'Gallery','गैलरी':'Gallery',
+      'phone':'Phone','फोन':'Phone',
+      'contacts':'Contacts','कॉन्टैक्ट्स':'Contacts',
+      'calculator':'Calculator','कैलकुलेटर':'Calculator',
+      'clock':'Clock','घड़ी':'Clock',
+      'calendar':'Calendar','कैलेंडर':'Calendar',
+      'spotify':'Spotify','स्पॉटिफाई':'Spotify',
+      'netflix':'Netflix','नेटफ्लिक्स':'Netflix',
+      'paytm':'Paytm','पेटीएम':'Paytm',
+      'phonepe':'PhonePe','फोनपे':'PhonePe',
+      'gpay':'Google Pay','google pay':'Google Pay','गूगल पे':'Google Pay'
+    };
+
+    var hasOpenIntent = openWords.some(function(w) { return q.includes(w); });
+
+    if (hasOpenIntent) {
+      for (var alias in appAliases) {
+        if (appAliases.hasOwnProperty(alias)) {
+          if (q.includes(alias)) {
+            return { type: 'open_app', data: { appName: appAliases[alias], rawName: alias } };
+          }
+        }
+      }
+      var naturalAppMatch = q.match(/(?:mujhe|मुझे)\s+([a-z\u0900-\u097F]+)\s+(?:par|पर|pe|पे)/);
+      if (naturalAppMatch && naturalAppMatch[1]) {
+        var natName = naturalAppMatch[1];
+        for (var alias2 in appAliases) {
+          if (appAliases.hasOwnProperty(alias2)) {
+            if (alias2.includes(natName) || natName.includes(alias2)) {
+              return { type: 'open_app', data: { appName: appAliases[alias2], rawName: alias2 } };
+            }
+          }
+        }
+      }
+    }
+
+    // ---------- WEB SEARCH ----------
+    var searchTriggers = ['search karo','search kar','google par search','google pe search','web par search',
+      'search for','search the web','internet par search','सर्च करो','सर्च कर','गूगल पर सर्च','ढूंढो','ढूढो','खोजो','खोज करो'];
+    var hasSearchIntent = searchTriggers.some(function(w) { return q.includes(w); });
+    if (hasSearchIntent) {
+      var searchQuery = q;
+      searchTriggers.forEach(function(t) { searchQuery = searchQuery.split(t).join(' '); });
+      searchQuery = searchQuery.replace(/\b(google|par|pe|me|mein|for|the|web|internet|पर|में|पे)\b/g, ' ').trim();
+      return { type: 'web_search', data: { query: searchQuery.length > 0 ? searchQuery : q } };
+    }
+
+    // ---------- OPEN SETTINGS ----------
+    var settingsWords = ['settings kholo','settings open','setting kholo','सेटिंग खोलो','सेटिंग्स खोलो',
+      'wifi settings','bluetooth settings','display settings','sound settings','wifi खोलो','bluetooth खोलो'];
+    var hasSettingsIntent = settingsWords.some(function(w) { return q.includes(w); });
+    if (hasSettingsIntent) {
+      var settingType = 'general';
+      if (q.includes('wifi') || q.includes('वाईफाई') || q.includes('wi-fi')) settingType = 'wifi';
+      else if (q.includes('bluetooth') || q.includes('ब्लूटूथ')) settingType = 'bluetooth';
+      else if (q.includes('display') || q.includes('डिस्प्ले')) settingType = 'display';
+      else if (q.includes('sound') || q.includes('साउंड') || q.includes('आवाज़')) settingType = 'sound';
+      else if (q.includes('notification') || q.includes('नोटिफिकेशन')) settingType = 'notifications';
+      else if (q.includes('location') || q.includes('लोकेशन')) settingType = 'location';
+      else if (q.includes('battery') || q.includes('बैटरी')) settingType = 'battery';
+      else if (q.includes('app') || q.includes('ऐप')) settingType = 'applications';
+      return { type: 'open_settings', data: { settingType: settingType } };
+    }
+
+    // ---------- CALL ----------
+    var callWords = ['call karo','call kar','call lagao','phone karo','phone kar','phone lagao','call',
+      'कॉल करो','कॉल कर','कॉल लगाओ','फोन करो','फोन कर','फोन लगाओ'];
+    var hasCallIntent = callWords.some(function(w) { return q.includes(w); });
+
+    if (hasCallIntent) {
+      var phoneMatch = q.match(/(\+?\d[\d\s\-]{7,15}\d)/);
+      if (phoneMatch) {
+        var phoneNumber = phoneMatch[1].replace(/[\s\-]/g, '');
+        if (phoneNumber.length >= 8) {
+          return { type: 'make_call', data: { phoneNumber: phoneNumber }, needsConfirmation: true };
+        }
+      }
+      var contactName = q;
+      contactName = contactName
+        .replace(/call karo/gi, ' ').replace(/call karna/gi, ' ').replace(/call kar/gi, ' ').replace(/call lagao/gi, ' ')
+        .replace(/phone karo/gi, ' ').replace(/phone karna/gi, ' ').replace(/phone kar/gi, ' ').replace(/phone lagao/gi, ' ')
+        .replace(/कॉल करो/g, ' ').replace(/कॉल करना/g, ' ').replace(/कॉल कर/g, ' ').replace(/कॉल लगाओ/g, ' ')
+        .replace(/फोन करो/g, ' ').replace(/फोन करना/g, ' ').replace(/फोन कर/g, ' ').replace(/फोन लगाओ/g, ' ');
+      contactName = contactName
+        .replace(/\bko\b/gi, ' ').replace(/\bpar\b/gi, ' ').replace(/\bpe\b/gi, ' ')
+        .replace(/\bmein\b/gi, ' ').replace(/\bme\b/gi, ' ')
+        .replace(/को/g, ' ').replace(/पर/g, ' ').replace(/पे/g, ' ').replace(/में/g, ' ').replace(/मे/g, ' ');
+      contactName = contactName.replace(/[.,!?]/g, ' ').replace(/\s+/g, ' ').trim();
+      contactName = contactName.replace(/^call\s+/i, '').replace(/^phone\s+/i, '').trim();
+
+      if (contactName.length > 0) {
+        return { type: 'call_contact', data: { contactName: contactName } };
+      }
+      return { type: 'make_call_need_number', data: {} };
+    }
+
+    // ---------- SMS ----------
+    var smsWords = ['sms bhejo','message bhejo','sms karo','message karo','message bhej','sms bhej',
+      'एसएमएस भेजो','मैसेज भेजो','संदेश भेजो','text bhejo','एसएमएस भेज','मैसेज भेज'];
+    var hasSmsIntent = smsWords.some(function(w) { return q.includes(w); });
+
+    if (hasSmsIntent) {
+      var smsPhoneMatch = q.match(/(\+?\d[\d\s\-]{7,15}\d)/);
+      if (smsPhoneMatch) {
+        var smsPhone = smsPhoneMatch[1].replace(/[\s\-]/g, '');
+        var msgMatch = q.match(/["'"'](.+?)["'"']/);
+        var msgText = msgMatch ? msgMatch[1] : null;
+        if (!msgText) return { type: 'send_sms_need_message', data: { phoneNumber: smsPhone } };
+        return { type: 'send_sms', data: { phoneNumber: smsPhone, message: msgText }, needsConfirmation: true };
+      }
+
+      var smsContactName = q;
+      smsContactName = smsContactName
+        .replace(/sms bhejo/gi, ' ').replace(/sms bhej/gi, ' ')
+        .replace(/message bhejo/gi, ' ').replace(/message bhej/gi, ' ')
+        .replace(/message karo/gi, ' ').replace(/sms karo/gi, ' ')
+        .replace(/text bhejo/gi, ' ')
+        .replace(/एसएमएस भेजो/g, ' ').replace(/एसएमएस भेज/g, ' ')
+        .replace(/मैसेज भेजो/g, ' ').replace(/मैसेज भेज/g, ' ')
+        .replace(/संदेश भेजो/g, ' ');
+      smsContactName = smsContactName
+        .replace(/\bko\b/gi, ' ').replace(/\bpar\b/gi, ' ').replace(/\bpe\b/gi, ' ')
+        .replace(/\bmein\b/gi, ' ').replace(/\bme\b/gi, ' ')
+        .replace(/को/g, ' ').replace(/पर/g, ' ').replace(/पे/g, ' ').replace(/में/g, ' ').replace(/मे/g, ' ');
+
+      var smsContactMsgMatch = q.match(/["'"'](.+?)["'"']/);
+      var smsContactMessage = smsContactMsgMatch ? smsContactMsgMatch[1] : null;
+      if (!smsContactMessage) {
+        var afterMsgMatch = q.match(/(?:message|मैसेज|संदेश|sms|एसएमएस)\s*(?:karo|kar|bhejo|bhej|भेजो|भेज)\s*(?:ki|कि|:)?\s*["'"']?(.+?)["'"']?$/i);
+        if (afterMsgMatch && afterMsgMatch[1]) smsContactMessage = afterMsgMatch[1].trim();
+      }
+      smsContactName = smsContactName.replace(/["'"'].+?["'"']/g, ' ').replace(/[.,!?]/g, ' ').replace(/\s+/g, ' ').trim();
+
+      if (smsContactName.length > 0 && !/^\d+$/.test(smsContactName)) {
+        if (!smsContactMessage) return { type: 'send_sms_contact_need_message', data: { contactName: smsContactName } };
+        return { type: 'send_sms_contact', data: { contactName: smsContactName, message: smsContactMessage }, needsConfirmation: true };
+      }
+      return { type: 'send_sms_need_number', data: {} };
+    }
+
+    // ---------- MAPS ----------
+    var mapsWords = ['maps par','maps mein','google maps','गूगल मैप','मैप्स में','मैप्स पर','navigate to','navigation'];
+    var hasMapsIntent = mapsWords.some(function(w) { return q.includes(w); });
+    if (hasMapsIntent) {
+      var mapQuery = q.replace(/(maps|map|google maps|गूगल मैप|मैप्स|par|pe|mein|में|पर|kholo|खोलो|open|show|search|karo|करो)/g, ' ').trim();
+      return { type: 'open_maps', data: { query: mapQuery || '' } };
+    }
+
+    // ---------- BATTERY ----------
+    if ((q.includes('battery') || q.includes('बैटरी')) &&
+        (q.includes('kitni') || q.includes('कितनी') || q.includes('percentage') || q.includes('percent') || q.includes('batao') || q.includes('बताओ'))) {
+      return { type: 'get_battery', data: {} };
+    }
+
+    // ---------- DEVICE INFO ----------
+    if ((q.includes('phone') || q.includes('device') || q.includes('फोन') || q.includes('डिवाइस')) &&
+        (q.includes('info') || q.includes('information') || q.includes('जानकारी') || q.includes('batao') || q.includes('बताओ'))) {
+      return { type: 'get_device_info', data: {} };
+    }
+
+    // ---------- LOCATION ----------
+    if (q.includes('meri location') || q.includes('मेरी लोकेशन') || q.includes('main kaha') || q.includes('मैं कहा') ||
+        q.includes('where am i') || q.includes('current location') || q.includes('my location')) {
+      return { type: 'get_location', data: {} };
+    }
+
+    // ---------- FLASHLIGHT ----------
+    if (q.includes('flashlight') || q.includes('torch') || q.includes('टॉर्च') || q.includes('फ्लैशलाइट')) {
+      if (q.includes('on') || q.includes('चालू') || q.includes('chalu') || q.includes('kholo') || q.includes('खोलो')) {
+        return { type: 'flashlight_on', data: {} };
+      }
+      if (q.includes('off') || q.includes('बंद') || q.includes('band')) {
+        return { type: 'flashlight_off', data: {} };
+      }
+    }
+
+    return null;
+  }
+
+  // ============================================================
+  // EXECUTE NATIVE COMMAND
+  // ============================================================
+  function executeNativeCommand(cmd) {
+    if (!cmd) return false;
+    console.log('[Zishu Native] Command detected:', cmd.type);
+
+    if (cmd.type === 'open_app') {
+      var appName = cmd.data.appName;
+      if (hasNative) {
+        var result = safeNative('openAppByName', appName);
+        if (result === null) {
+          var msg = appName + ' kholne ki koshish kar rahi hoon. Agar open na ho, to app installed nahi ho sakti.';
+          addActionMessage(msg); speakText(msg);
+        } else {
+          addActionMessage(appName + ' khol rahi hoon.');
+        }
+      } else {
+        var siteKey = null;
+        for (var k in SITE_ALIASES) {
+          if (SITE_ALIASES.hasOwnProperty(k)) {
+            if (SITE_ALIASES[k].some(function(a) { return cmd.data.rawName && a.includes(cmd.data.rawName); }) ||
+                k === cmd.data.rawName || k === appName.toLowerCase()) { siteKey = k; break; }
+          }
+        }
+        if (siteKey && WEBSITE_MAP[siteKey]) {
+          addActionMessage('Opening ' + appName + ' in browser...');
+          try { window.open(WEBSITE_MAP[siteKey], '_blank'); }
+          catch (e) { addActionMessage(appName + ' browser mein available nahi hai.'); speakText(appName + ' browser mein available nahi hai.'); }
+        } else {
+          var m2 = appName + ' ko open karne ke liye Zishu Android app use karein.';
+          addActionMessage(m2); speakText(m2);
+        }
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'web_search') {
+      var searchQ = cmd.data.query;
+      if (hasNative) {
+        var r = safeNative('searchWeb', searchQ);
+        if (r === null) {
+          var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ);
+          window.open(url, '_blank');
+        }
+        addActionMessage('Search khol rahi hoon.');
+      } else {
+        window.open('https://www.google.com/search?q=' + encodeURIComponent(searchQ), '_blank');
+        addActionMessage('Search khol rahi hoon.');
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'open_settings') {
+      if (hasNative) {
+        var rs = safeNative('openSettings', cmd.data.settingType);
+        if (rs === null) addActionMessage('Settings kholne ki koshish kar rahi hoon.');
+        else addActionMessage('Settings khol rahi hoon.');
+      } else {
+        addActionMessage('Settings sirf Android app mein available hai.');
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'open_maps') {
+      if (hasNative) {
+        var rm = safeNative('openMaps', cmd.data.query || '');
+        if (rm === null) {
+          var mapUrl = cmd.data.query ? 'https://www.google.com/maps/search/' + encodeURIComponent(cmd.data.query) : 'https://www.google.com/maps';
+          window.open(mapUrl, '_blank');
+        }
+      } else {
+        var mapUrl2 = cmd.data.query ? 'https://www.google.com/maps/search/' + encodeURIComponent(cmd.data.query) : 'https://www.google.com/maps';
+        window.open(mapUrl2, '_blank');
+      }
+      addActionMessage('Maps khol rahi hoon.');
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'call_contact') {
+      var contactName = cmd.data.contactName;
+      if (hasNative) {
+        safeNative('callContact', contactName);
+        var contactMsg = contactName + ' ko call screen par le ja rahi hoon.';
+        addActionMessage(contactMsg); speakText(contactMsg);
+      } else {
+        var browserMsg = 'Contact calling sirf Android app mein available hai.';
+        addActionMessage(browserMsg); speakText(browserMsg);
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'make_call') {
+      pendingNativeAction = { type: 'make_call', data: cmd.data };
+      var confMsg = 'Main ' + cmd.data.phoneNumber + ' par call karne wali hoon. Confirm karein? (haan / nahi)';
+      addActionMessage(confMsg); speakText(confMsg);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1500);
+      return true;
+    }
+
+    if (cmd.type === 'make_call_need_number') {
+      var msg = 'Kis number par call karna hai? Number bataiye.';
+      addActionMessage(msg); speakText(msg);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'send_sms') {
+      pendingNativeAction = { type: 'send_sms', data: cmd.data };
+      var confMsg2 = cmd.data.phoneNumber + ' ko message bhejna hai: "' + cmd.data.message + '". Confirm karein? (haan / nahi)';
+      addActionMessage(confMsg2); speakText(confMsg2);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1500);
+      return true;
+    }
+
+    if (cmd.type === 'send_sms_contact') {
+      pendingNativeAction = { type: 'send_sms_contact', data: cmd.data };
+      var confMsgContact = cmd.data.contactName + ' ko message bhejna hai: "' + cmd.data.message + '". Confirm karein? (haan / nahi)';
+      addActionMessage(confMsgContact); speakText(confMsgContact);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1500);
+      return true;
+    }
+
+    if (cmd.type === 'send_sms_contact_need_message') {
+      pendingNativeAction = { type: 'await_sms_contact_message', data: { contactName: cmd.data.contactName } };
+      var msgCM = cmd.data.contactName + ' ko kya message bhejna hai? Bataiye.';
+      addActionMessage(msgCM); speakText(msgCM);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1500);
+      return true;
+    }
+
+    if (cmd.type === 'send_sms_need_message') {
+      var msg3 = 'Message kya bhejna hai? Bataiye.';
+      addActionMessage(msg3); speakText(msg3);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'send_sms_need_number') {
+      var msg4 = 'Kis contact ko SMS bhejna hai? Contact ka naam bataiye.';
+      addActionMessage(msg4); speakText(msg4);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'get_battery') {
+      if (hasNative) {
+        var b = safeNative('getBatteryInfo');
+        if (b === null) {
+          addActionMessage('Battery info sirf Android app mein available hai.');
+          speakText('Battery info sirf Android app mein available hai.');
+        }
+      } else {
+        addActionMessage('Battery info sirf Android app mein available hai.');
+        speakText('Battery info sirf Android app mein available hai.');
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'get_device_info') {
+      if (hasNative) {
+        safeNative('getDeviceInfo');
+        addActionMessage('Device info nikal rahi hoon...');
+      } else {
+        addActionMessage('Device info sirf Android app mein available hai.');
+        speakText('Device info sirf Android app mein available hai.');
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'get_location') {
+      if (hasNative) {
+        safeNative('getLocation');
+        addActionMessage('Aapki location nikal rahi hoon...');
+      } else {
+        addActionMessage('Location sirf Android app mein available hai.');
+        speakText('Location sirf Android app mein available hai.');
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    if (cmd.type === 'flashlight_on' || cmd.type === 'flashlight_off') {
+      if (hasNative) {
+        safeNative('setFlashlight', cmd.type === 'flashlight_on');
+        addActionMessage(cmd.type === 'flashlight_on' ? 'Flashlight on kar rahi hoon.' : 'Flashlight off kar rahi hoon.');
+      } else {
+        addActionMessage('Flashlight sirf Android app mein available hai.');
+        speakText('Flashlight sirf Android app mein available hai.');
+      }
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return true;
+    }
+
+    return false;
+  }
+
+  // ============================================================
+  // HANDLE USER QUERY
+  // ============================================================
+  function handleUserQuery(query) {
+    if (isProcessing) return;
+    isProcessing = true;
+    isStopped = false;
+    isSpeakingNow = false;
+    clearRestartTimer();
+    setOrbState(STATE.THINKING);
+
+    addMessage('user', query);
+
+    // 1. Pending confirmation
+    if (pendingNativeAction) {
+      if (pendingNativeAction.type === 'await_sms_contact_message') {
+        var pendingContact = pendingNativeAction.data.contactName;
+        var messageBody = query.trim();
+        if (messageBody.length > 0 && !isConfirmationNo(query)) {
+          pendingNativeAction = { type: 'send_sms_contact', data: { contactName: pendingContact, message: messageBody } };
+          var confirmMsg = pendingContact + ' ko message bhejna hai: "' + messageBody + '". Confirm karein? (haan / nahi)';
+          addActionMessage(confirmMsg); speakText(confirmMsg);
+          isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1500);
+          return;
+        } else {
+          pendingNativeAction = null;
+        }
+      } else if (isConfirmationYes(query)) {
+        executePendingAction(); return;
+      } else if (isConfirmationNo(query)) {
+        cancelPendingAction(); return;
+      } else {
+        pendingNativeAction = null;
+      }
+    }
+
+    // 2. Native commands
+    var nativeCmd = detectNativeCommand(query);
+    if (nativeCmd) { if (executeNativeCommand(nativeCmd)) return; }
+
+    // 3. Local actions
+    var actionResult = handleActions(query);
+    if (actionResult) {
+      addActionMessage(actionResult);
+      speakText(actionResult).then(function() {
+        isProcessing = false;
+        if (!isStopped) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+      });
+      return;
+    }
+
+    // 4. Local answers
+    var localAnswer = getLocalAnswer(query);
+    if (localAnswer) {
+      streamResponse(localAnswer);
+      isProcessing = false;
+      if (!isStopped) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+      return;
+    }
+
+    // 5. Local website commands
+    var localCommand = detectLocalCommand(query);
+    if (localCommand && localCommand.type === 'open_website') {
+      openWebsiteDirectly(localCommand.value);
+      isProcessing = false; setOrbState(STATE.IDLE); scheduleRestart(1200);
+      return;
+    }
+
+    // 6. AI backend
+    // ------------------------------------------------------------
+    // IMPORTANT: The original user query is sent to the backend WITHOUT
+    // transliteration. Hindi/Devanagari questions must reach the backend
+    // unchanged so the AI can understand them properly.
+    // (The transliterateDevanagariToHinglish function is retained above
+    //  for legacy/local uses such as contact matching — it is NOT
+    //  applied to the AI backend query.)
+    // ------------------------------------------------------------
+    try {
+      var originalQuery = query;
+      var timestampedQuery = originalQuery + ' (Current date: ' + new Date().toISOString().split('T')[0] + ')';
+
+      fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: timestampedQuery, history: conversationHistory })
+      })
+      .then(function(response) {
+        if (!response.ok) throw new Error('Server error: ' + response.status);
+        return response.json();
+      })
+      .then(function(data) {
+        conversationHistory = data.history || [];
+        if (isStopped) { isProcessing = false; return; }
+        streamResponse(data.response);
+        isProcessing = false;
+        if (!isStopped && state !== STATE.LISTENING && !isSpeakingNow) {
+          setTimeout(function() {
+            if (state !== STATE.SPEAKING && !isStopped && !isSpeakingNow) {
+              setOrbState(STATE.IDLE);
+              scheduleRestart(1000);
+            }
+          }, 500);
+        }
+      })
+      .catch(function(error) {
+        addToolMessage('Error: ' + error.message);
+        setOrbState(STATE.IDLE);
+        isProcessing = false;
+      });
+    } catch (error) {
+      addToolMessage('Error: ' + error.message);
+      setOrbState(STATE.IDLE);
+      isProcessing = false;
+    }
+  }
+
+  // ============================================================
+  // NATIVE CALLBACKS
+  // ============================================================
+  window.ZishuNativeListeningStarted = function() {
+    try {
+      console.log('[Zishu Native] Listening started');
+      clearRestartTimer();
+      setOrbState(STATE.LISTENING);
+      if (isFirstActivation) { isFirstActivation = false; if (orbSub) orbSub.textContent = 'Listening...'; }
+    } catch (e) { console.error('[Zishu Native] ListeningStarted error:', e); }
+  };
+
+  window.ZishuNativeListeningStopped = function() {
+    try {
+      console.log('[Zishu Native] Listening stopped');
+      clearRestartTimer();
+      if (!isProcessing && state !== STATE.SPEAKING && !isSpeakingNow) setOrbState(STATE.IDLE);
+    } catch (e) { console.error('[Zishu Native] ListeningStopped error:', e); }
+  };
+
+  window.ZishuNativeListeningError = function(message) {
+    try {
+      console.log('[Zishu Native] Listening error:', message);
+      if (orbStatus) orbStatus.textContent = 'Microphone error';
+      if (orbSub) orbSub.textContent = message || 'Please try again';
+      setOrbState(STATE.IDLE);
+      isProcessing = false;
+    } catch (e) { console.error('[Zishu Native] ListeningError error:', e); }
+  };
+
+  var lastNativeResult = '';
+  var lastNativeResultTime = 0;
+
+  window.ZishuNativeResult = function(text) {
+    try {
+      if (!text || !text.trim()) return;
+      text = text.trim();
+
+      var now = Date.now();
+      if (text === lastNativeResult && (now - lastNativeResultTime) < 1500) {
+        console.log('[Zishu Native] Duplicate result ignored:', text);
+        return;
+      }
+      lastNativeResult = text;
+      lastNativeResultTime = now;
+
+      console.log('[Zishu Native] Speech result:', text);
+
+      if (isStopCommand(text)) {
+        if (isSpeakingNow || isProcessing || state === STATE.SPEAKING) { stopCurrentResponse(); return; }
+      }
+      handleUserQuery(text);
+    } catch (error) { console.error('[Zishu Native] Result processing error:', error); }
+  };
+
+  window.ZishuNativeSpeakingStarted = function() {
+    try {
+      console.log('[Zishu Native] Speaking started');
+      isSpeakingNow = true;
+      setOrbState(STATE.SPEAKING);
+    } catch (e) { console.error('[Zishu Native] SpeakingStarted error:', e); }
+  };
+
+  window.ZishuNativeSpeakingFinished = function() {
+    try {
+      console.log('[Zishu Native] Speaking finished');
+      isSpeakingNow = false;
+      currentUtterance = null;
+      if (utteranceResolve) { utteranceResolve(); utteranceResolve = null; }
+      if (!isStopped && !isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+    } catch (e) { console.error('[Zishu Native] SpeakingFinished error:', e); }
+  };
+
+  window.ZishuNativeSpeakingError = function(message) {
+    try {
+      console.log('[Zishu Native] Speaking error:', message);
+      isSpeakingNow = false;
+      currentUtterance = null;
+      if (utteranceResolve) { utteranceResolve(); utteranceResolve = null; }
+      if (!isStopped && !isProcessing) { setOrbState(STATE.IDLE); scheduleRestart(1000); }
+    } catch (e) { console.error('[Zishu Native] SpeakingError error:', e); }
+  };
+
+  window.ZishuNativePermissionGranted = function(permission) {
+    try { console.log('[Zishu Native] Permission granted:', permission); }
+    catch (e) { console.error('[Zishu Native] PermissionGranted error:', e); }
+  };
+
+  window.ZishuNativePermissionDenied = function(permission) {
+    try {
+      console.log('[Zishu Native] Permission denied:', permission);
+      addToolMessage('Permission denied: ' + permission);
+    } catch (e) { console.error('[Zishu Native] PermissionDenied error:', e); }
+  };
+
+  window.ZishuNativeWakeWordDetected = function() {
+    try {
+      console.log('[Zishu Native] Wake word detected');
+      if (!isProcessing && !isSpeakingNow) {
+        setOrbState(STATE.LISTENING);
+        if (hasNative) safeNative('startListening');
+      }
+    } catch (e) { console.error('[Zishu Native] WakeWordDetected error:', e); }
+  };
+
+  window.ZishuNativeWakeWordState = function(enabled) {
+    try { console.log('[Zishu Native] Wake word state:', enabled); }
+    catch (e) { console.error('[Zishu Native] WakeWordState error:', e); }
+  };
+
+  window.ZishuNativeActionResult = function(action, result) {
+    try {
+      console.log('[Zishu Native] Native result:', action, result);
+      var r = result;
+      if (typeof r === 'string') {
+        if (r === 'not_installed') addActionMessage('Yeh app aapke phone mein installed nahi hai.');
+        else if (r === 'unknown_app') addActionMessage('Main is app ko identify nahi kar pai.');
+        else if (r === 'permission_denied') addActionMessage('Permission denied. Please grant permission.');
+        else if (r === 'failed' || r === 'error') addActionMessage('Kuch galat ho gaya. Dobara try karein.');
+        else if (r === 'contact_not_found') addActionMessage('Yeh contact aapke phone mein nahi mila.');
+      }
+    } catch (e) { console.error('[Zishu Native] ActionResult error:', e); }
+  };
+
+  window.ZishuNativeInstalledAppsResult = function(apps) {
+    try { console.log('[Zishu Native] Installed apps received:', apps ? apps.length : 0); }
+    catch (e) { console.error('[Zishu Native] InstalledAppsResult error:', e); }
+  };
+
+  window.ZishuNativeDeviceInfoResult = function(info) {
+    try {
+      console.log('[Zishu Native] Device info:', info);
+      var text = '';
+      if (typeof info === 'string') text = info;
+      else if (info && typeof info === 'object') text = Object.keys(info).map(function(k) { return k + ': ' + info[k]; }).join('\n');
+      if (text) {
+        var msgDiv = document.createElement('div');
+        msgDiv.className = 'zishu-message zishu-assistant-msg';
+        var s = document.createElement('span'); s.className = 'zishu-sender'; s.textContent = 'Zishu';
+        var c = document.createElement('span'); c.className = 'zishu-content'; c.textContent = text;
+        msgDiv.appendChild(s); msgDiv.appendChild(c);
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        speakText(text);
+      }
+    } catch (e) { console.error('[Zishu Native] DeviceInfoResult error:', e); }
+  };
+
+  window.ZishuNativeBatteryResult = function(info) {
+    try {
+      console.log('[Zishu Native] Battery info:', info);
+      var text = '';
+      if (typeof info === 'string') text = info;
+      else if (info && typeof info === 'object') {
+        var level = info.level || info.percent || info.percentage;
+        var charging = info.charging || info.isCharging;
+        text = 'Battery: ' + level + '%' + (charging ? ' (charging)' : '');
+      }
+      if (text) {
+        var msgDiv = document.createElement('div');
+        msgDiv.className = 'zishu-message zishu-assistant-msg';
+        var s = document.createElement('span'); s.className = 'zishu-sender'; s.textContent = 'Zishu';
+        var c = document.createElement('span'); c.className = 'zishu-content'; c.textContent = text;
+        msgDiv.appendChild(s); msgDiv.appendChild(c);
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        speakText(text);
+      }
+    } catch (e) { console.error('[Zishu Native] BatteryResult error:', e); }
+  };
+
+  window.ZishuNativeLocationResult = function(location) {
+    try {
+      console.log('[Zishu Native] Location result:', location);
+      var text = '';
+      if (typeof location === 'string') text = 'Your location: ' + location;
+      else if (location && typeof location === 'object') text = 'Lat: ' + location.latitude + ', Lng: ' + location.longitude;
+      if (text) {
+        var msgDiv = document.createElement('div');
+        msgDiv.className = 'zishu-message zishu-assistant-msg';
+        var s = document.createElement('span'); s.className = 'zishu-sender'; s.textContent = 'Zishu';
+        var c = document.createElement('span'); c.className = 'zishu-content'; c.textContent = text;
+        msgDiv.appendChild(s); msgDiv.appendChild(c);
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        speakText(text);
+      }
+    } catch (e) { console.error('[Zishu Native] LocationResult error:', e); }
+  };
+
+  window.ZishuNativeNotificationResult = function(result) {
+    try { console.log('[Zishu Native] Notification result:', result); }
+    catch (e) { console.error('[Zishu Native] NotificationResult error:', e); }
+  };
+
+  window.ZishuNativeError = function(action, error) {
+    try {
+      console.error('[Zishu Native] Native error:', action, error);
+      addToolMessage('Error: ' + action + ' - ' + error);
+    } catch (e) { console.error('[Zishu Native] Error callback error:', e); }
+  };
+
+  window.ZishuNativeAssistantStateChanged = function(s) {
+    try { console.log('[Zishu Native] Assistant state:', s); }
+    catch (e) { console.error('[Zishu Native] AssistantStateChanged error:', e); }
+  };
+
+  // ============================================================
+  // KEYBOARD SHORTCUT
+  // ============================================================
+  document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' && !e.repeat && !e.target.matches('input, textarea, button, a')) {
+      e.preventDefault();
+      if (isSpeakingNow || state === STATE.SPEAKING || isProcessing) stopCurrentResponse();
+      else toggleListening();
+    }
+  });
+
+  // ============================================================
+  // CHIPS — run through AI pipeline
+  // ============================================================
+  document.querySelectorAll('.chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var text = chip.textContent.replace(/^["']|["']$/g, '').replace(/^Zishu,\s*/i, '');
+      handleUserQuery(text);
+    });
+  });
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  setTimeout(forceLoadVoices, 100);
+  setTimeout(forceLoadVoices, 500);
+  setTimeout(forceLoadVoices, 1000);
+
+  setOrbState(STATE.IDLE);
+  setTimeout(checkAlarms, 1000);
+
+  addMessage('assistant', 'Namaste! Main Zishu hoon. "Zishu" bole ya orb tap karein. Main call, message, apps, settings, alarms sab kar sakta hoon!');
+
+  console.log('Zishu AI v3.2 — Original Hindi/Devanagari query now sent to backend unchanged');
+  console.log('Native bridge:', hasNative ? 'available' : 'not available (browser mode)');
+})();
+</script>
+
+</body>
+</html>
